@@ -8,9 +8,9 @@
 
 struct GameState
 {
-    GLuint cube_vao_id;
-    GLuint cube_vbo_id;
-    struct Shader cube_shader;
+    GLuint pyramid_vao_id;
+    GLuint pyramid_vbo_id;
+    struct Shader pyramid_shader;
 };
 
 #ifdef PLATFORM_HOTLOAD_GAME_CODE
