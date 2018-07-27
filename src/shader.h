@@ -1,7 +1,6 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include <glad/glad.h> // get opengl headers
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,7 +13,7 @@ struct Shader
 };
 
 char *read_file(char *file_path);
-struct Shader shader_compile(GLchar *vertex_path, GLchar *fragment_path);
+struct Shader shader_compile(char *vertex_path, char *fragment_path);
 void shader_use(struct Shader *s);
 void shader_setb(struct Shader *s, char *name, bool value);
 void shader_seti(struct Shader *s, char *name, int value);

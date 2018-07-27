@@ -3,7 +3,11 @@
 #include <assert.h>
 #include <math.h>
 
-#include <glad/glad.h>
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
+#include "glad/glad.h"
+#endif
 
 
 #ifdef PLATFORM_HOTLOAD_GAME_CODE
@@ -108,7 +112,7 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     shader_use(&game_state->pyramid_shader);
 

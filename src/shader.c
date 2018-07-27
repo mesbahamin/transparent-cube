@@ -1,5 +1,11 @@
 #include "shader.h"
 
+#ifdef __EMSCRIPTEN__
+#include <GLES3/gl3.h>
+#else
+#include "glad/glad.h"
+#endif
+
 
 char *read_file(char *file_path)
 {
@@ -36,7 +42,7 @@ char *read_file(char *file_path)
 }
 
 
-struct Shader shader_compile(GLchar *vertex_path, GLchar *fragment_path)
+struct Shader shader_compile(char *vertex_path, char *fragment_path)
 {
     const GLchar *vertex_shader_source = read_file(vertex_path);
     const GLchar *fragment_shader_source = read_file(fragment_path);
