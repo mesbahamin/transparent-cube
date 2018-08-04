@@ -56,40 +56,30 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
         float half_length = edge_length / 2.0f;
         float half_height = height / 2.0f;
 
-
         GLfloat pyramid_vertices[] = {
              // positions
              -half_length, -half_height, -half_length,
-              half_length, -half_height, -half_length,
-              half_length, -half_height,  half_length,
-
-              half_length, -half_height,  half_length,
              -half_length, -half_height,  half_length,
-             -half_length, -half_height, -half_length,
-
-             -half_length, -half_height, -half_length,
-              0.0f,         half_height,  0.0f,
-              half_length, -half_height, -half_length,
-
+              half_length, -half_height,  half_length,
               half_length, -half_height, -half_length,
               0.0f,         half_height,  0.0f,
-              half_length, -half_height,  half_length,
+        };
 
-              half_length, -half_height,  half_length,
-              0.0f,         half_height,  0.0f,
-             -half_length, -half_height,  half_length,
-
-             -half_length, -half_height,  half_length,
-              0.0f,         half_height,  0.0f,
-             -half_length, -half_height, -half_length,
+        GLuint elements[] = {
+            0, 3, 2,
+            2, 1, 0,
+            0, 4, 3,
+            3, 4, 2,
+            2, 4, 1,
+            1, 4, 0,
         };
 
         GLuint pyramid_vao_id;
-        GLuint pyramid_vbo_id;
         glGenVertexArrays(1, &pyramid_vao_id);
-        glGenBuffers(1, &pyramid_vbo_id);
-
         glBindVertexArray(pyramid_vao_id);
+
+        GLuint pyramid_vbo_id;
+        glGenBuffers(1, &pyramid_vbo_id);
         glBindBuffer(GL_ARRAY_BUFFER, pyramid_vbo_id);
         glBufferData(GL_ARRAY_BUFFER, sizeof(pyramid_vertices), pyramid_vertices, GL_STATIC_DRAW);
 
@@ -97,10 +87,16 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(*pyramid_vertices), (GLvoid*)0);
         glEnableVertexAttribArray(0);
 
+        GLuint pyramid_ebo_id;
+        glGenBuffers(1, &pyramid_ebo_id);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pyramid_ebo_id);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
         glBindVertexArray(0);
 
         game_state->pyramid_vao_id = pyramid_vao_id;
         game_state->pyramid_vbo_id = pyramid_vbo_id;
+        game_state->pyramid_ebo_id = pyramid_ebo_id;
     }
 
     game_state->pyramid_shader = shader_compile("shader/pyramid_v.glsl", "shader/pyramid_f.glsl");
@@ -139,7 +135,7 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
         shader_setv3(&game_state->pyramid_shader, "pyramid_color", &pyramid_color);
 
         glBindVertexArray(game_state->pyramid_vao_id);
-        glDrawArrays(GL_TRIANGLES, 0, 18);
+        glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 }
@@ -149,4 +145,5 @@ void game_cleanup(struct GameState *game_state)
 {
     glDeleteVertexArrays(1, &game_state->pyramid_vao_id);
     glDeleteBuffers(1, &game_state->pyramid_vbo_id);
+    glDeleteBuffers(1, &game_state->pyramid_ebo_id);
 }

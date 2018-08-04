@@ -15,6 +15,7 @@ struct GameState
 {
     GLuint pyramid_vao_id;
     GLuint pyramid_vbo_id;
+    GLuint pyramid_ebo_id;
     struct Shader pyramid_shader;
 };
 
