@@ -16,7 +16,11 @@ struct GameState
     GLuint pyramid_vao_id;
     GLuint pyramid_vbo_id;
     GLuint pyramid_ebo_id;
+    GLuint cube_vao;
+    GLuint cube_vbo;
+    GLuint cube_ebo;
     struct Shader pyramid_shader;
+    struct Shader cube_shader;
 };
 
 #ifdef PLATFORM_HOTLOAD_GAME_CODE

@@ -99,7 +99,59 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
         game_state->pyramid_ebo_id = pyramid_ebo_id;
     }
 
+    // load cube vertex data
+    {
+        GLfloat cube_vertices[] = {
+             // positions         // colors
+            -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
+            -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,
+        };
+
+        GLuint elements[] = {
+            0, 4, 6, 6, 2, 0,
+            1, 5, 7, 7, 3, 1,
+            3, 2, 0, 0, 1, 3,
+            7, 6, 4, 4, 5, 7,
+            0, 4, 5, 5, 1, 0,
+            2, 6, 7, 7, 3, 2,
+        };
+
+        GLuint cube_vao;
+        glGenVertexArrays(1, &cube_vao);
+        glBindVertexArray(cube_vao);
+
+        GLuint cube_vbo;
+        glGenBuffers(1, &cube_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+
+        // positions
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(*cube_vertices), (GLvoid*)0);
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(*cube_vertices), (GLvoid*)(3 * sizeof(*cube_vertices)));
+        glEnableVertexAttribArray(1);
+
+        GLuint cube_ebo;
+        glGenBuffers(1, &cube_ebo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
+        glBindVertexArray(0);
+
+        game_state->cube_vao = cube_vao;
+        game_state->cube_vbo = cube_vbo;
+        game_state->cube_ebo = cube_ebo;
+    }
+
     game_state->pyramid_shader = shader_compile("shader/pyramid_v.glsl", "shader/pyramid_f.glsl");
+    game_state->cube_shader = shader_compile("shader/cube_v.glsl", "shader/cube_f.glsl");
 }
 
 
@@ -110,18 +162,18 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    shader_use(&game_state->pyramid_shader);
-
     m4 view = glmth_m4_init_id();
     m4 projection = glmth_m4_init_id();
     view = glmth_translate(view, glmth_v3_init(0.0f, 0.0f, -3.0f));
     projection = glmth_projection_perspective_fov(glmth_rad(45.0f), (float)screen_width / (float)screen_height, 0.1f, 100.0f);
 
-    shader_setm4(&game_state->pyramid_shader, "view", &view);
-    shader_setm4(&game_state->pyramid_shader, "projection", &projection);
-
+#if 0
     // render pyramid
     {
+        shader_use(&game_state->pyramid_shader);
+        shader_setm4(&game_state->pyramid_shader, "view", &view);
+        shader_setm4(&game_state->pyramid_shader, "projection", &projection);
+
         m4 model = glmth_m4_init_id();
         f32 angle = 20.0f;
         model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(0.5f, 1.0f, 0.0f));
@@ -136,6 +188,24 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
 
         glBindVertexArray(game_state->pyramid_vao_id);
         glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
+        glBindVertexArray(0);
+    }
+#endif
+
+    // render cube
+    {
+        shader_use(&game_state->cube_shader);
+        shader_setm4(&game_state->cube_shader, "view", &view);
+        shader_setm4(&game_state->cube_shader, "projection", &projection);
+
+        m4 model = glmth_m4_init_id();
+        f32 angle = 20.0f;
+        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(0.5f, 1.0f, 0.0f));
+
+        shader_setm4(&game_state->cube_shader, "model", &model);
+
+        glBindVertexArray(game_state->cube_vao);
+        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }
 }
