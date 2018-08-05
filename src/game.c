@@ -47,8 +47,6 @@ float randf(float min, float max)
 
 void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t screen_height)
 {
-    glEnable(GL_DEPTH_TEST);
-
     // load pyramid vertex data
     {
         float edge_length = 1.0f;
@@ -152,11 +150,14 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
 
     game_state->pyramid_shader = shader_compile("shader/pyramid_v.glsl", "shader/pyramid_f.glsl");
     game_state->cube_shader = shader_compile("shader/cube_v.glsl", "shader/cube_f.glsl");
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 
 void game_update_and_render(struct GameState *game_state, float dt, uint32_t screen_width, uint32_t screen_height)
 {
+    glDepthMask(GL_TRUE);
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -194,19 +195,35 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
 
     // render cube
     {
+        // Depth testing causes the blending to be applied inconsistently
+        // depending on the draw order, so we must disable it.
+        glDisable(GL_DEPTH_TEST);
+
+        glEnable(GL_BLEND);
+        // TODO: get this to work regardless of background color
+        glBlendColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glBlendFunc(GL_SRC_ALPHA, GL_CONSTANT_ALPHA);
+
         shader_use(&game_state->cube_shader);
         shader_setm4(&game_state->cube_shader, "view", &view);
         shader_setm4(&game_state->cube_shader, "projection", &projection);
 
         m4 model = glmth_m4_init_id();
         f32 angle = 20.0f;
-        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(0.5f, 1.0f, 0.0f));
+        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(1.0f, 0.0f, 0.0f));
+        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(0.0f, 1.0f, 0.0f));
+        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(0.0f, 0.0f, 1.0f));
 
+        f32 alpha = 0.2f * (1.5f + sinf(0.5f * dt));
         shader_setm4(&game_state->cube_shader, "model", &model);
+        shader_setf(&game_state->cube_shader, "alpha", alpha);
 
         glBindVertexArray(game_state->cube_vao);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
     }
 }
 
