@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+// TODO: remove references to emscripten
 #ifdef __EMSCRIPTEN__
 #include <GLES3/gl3.h>
 #else

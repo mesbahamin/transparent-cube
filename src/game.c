@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <math.h>
 
+// TODO: remove references to emscripten
 #ifdef __EMSCRIPTEN__
 #include <GLES3/gl3.h>
 #else
@@ -152,6 +153,11 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
     game_state->cube_shader = shader_compile("shader/cube_v.glsl", "shader/cube_f.glsl");
 
     glEnable(GL_DEPTH_TEST);
+
+    // TODO: remove references to emscripten
+#ifndef __EMSCRIPTEN__
+    glEnable(GL_MULTISAMPLE);
+#endif
 }
 
 
