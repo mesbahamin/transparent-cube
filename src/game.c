@@ -164,7 +164,7 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
 void game_update_and_render(struct GameState *game_state, float dt, uint32_t screen_width, uint32_t screen_height)
 {
     glDepthMask(GL_TRUE);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
