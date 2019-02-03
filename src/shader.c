@@ -44,8 +44,31 @@ char *read_file(char *file_path)
 
 struct Shader shader_compile(char *vertex_path, char *fragment_path)
 {
-    const GLchar *vertex_shader_source = read_file(vertex_path);
-    const GLchar *fragment_shader_source = read_file(fragment_path);
+    const GLchar *vertex_shader_source =
+        "#version 300 es\n"
+        "precision highp float;\n"
+        "layout (location = 0) in vec3 a_position;\n"
+        "layout (location = 1) in vec3 a_color;\n"
+        "uniform mat4 model;\n"
+        "uniform mat4 view;\n"
+        "uniform mat4 projection;\n"
+        "out vec3 color;\n"
+        "void main()\n"
+        "{\n"
+        "    gl_Position = projection * view * model * vec4(a_position, 1.0f);\n"
+        "    color = a_color;\n"
+        "}\n";
+
+    const GLchar *fragment_shader_source =
+        "#version 300 es\n"
+        "precision highp float;\n"
+        "uniform float alpha;\n"
+        "in vec3 color;\n"
+        "out vec4 frag_color;\n"
+        "void main()\n"
+        "{\n"
+        "    frag_color = vec4(color, alpha);\n"
+        "}\n";
 
     GLint success;
     GLchar info_log[512];
