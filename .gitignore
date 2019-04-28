@@ -1,6 +1,7 @@
 *.out
 *.swp
 
+lib/glfw_windows/*
 build/*
 
 tags
