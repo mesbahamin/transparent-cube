@@ -1,5 +1,11 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
+
+#include <assert.h>
+#include <math.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 // TODO: remove references to emscripten
 #ifdef __EMSCRIPTEN__
@@ -33,5 +39,3 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
 
 void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t screen_height);
 void game_cleanup(struct GameState *game_state);
-
-#endif

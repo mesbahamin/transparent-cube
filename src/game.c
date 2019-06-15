@@ -1,14 +1,11 @@
 #include "game.h"
 
-#include <assert.h>
-#include <math.h>
-
 // TODO: remove references to emscripten
-#ifdef __EMSCRIPTEN__
-#include <GLES3/gl3.h>
-#else
-#include "glad/glad.h"
+#ifndef __EMSCRIPTEN__
+#include "glad.c"
 #endif
+
+#include "shader.c"
 
 #ifdef PLATFORM_HOTLOAD_GAME_CODE
 void game_load_opengl_symbols(void)

@@ -1,11 +1,4 @@
-#ifndef SHADER_H
-#define SHADER_H
-
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "glmth.h"
+#pragma once
 
 struct Shader
 {
@@ -22,5 +15,3 @@ void shader_setm4(struct Shader *s, char *name, m4 *mat);
 void shader_setf3(struct Shader *s, char *name, f32 x, f32 y, f32 z);
 void shader_setf3_1(struct Shader *s, char *name, f32 f);
 void shader_setv3(struct Shader *s, char *name, v3 *v);
-
-#endif

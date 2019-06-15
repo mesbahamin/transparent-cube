@@ -1,12 +1,4 @@
-#ifndef GLMTH_H
-#define GLMTH_H
-
-#include <assert.h>
-#include <math.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+#pragma once
 
 #ifndef M_PI
 #define M_PI 3.14159265359f
@@ -239,5 +231,3 @@ inline m4 glmth_projection_perspective_fov(f32 fovy, f32 aspect, f32 near, f32 f
 
     return glmth_projection_perspective(left, right, bottom, top, near, far);
 }
-
-#endif
