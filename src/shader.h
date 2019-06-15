@@ -1,12 +1,9 @@
-#pragma once
-
 struct Shader
 {
     u32 program;
 };
 
-char *read_file(char *file_path);
-struct Shader shader_compile(char *vertex_path, char *fragment_path);
+struct Shader shader_compile(const GLchar *vertex_shader_source, const GLchar *fragment_shader_source);
 void shader_use(struct Shader *s);
 void shader_setb(struct Shader *s, char *name, bool value);
 void shader_seti(struct Shader *s, char *name, int value);

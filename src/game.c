@@ -59,7 +59,16 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
         game_state->cube_ebo = cube_ebo;
     }
 
-    game_state->cube_shader = shader_compile("shader/cube_v.glsl", "shader/cube_f.glsl");
+    // game_shader_load
+    {
+        struct PlatformApi platform = game_state->platform;
+        char *v_source = platform.platform_read_entire_file("shader/cube_v.glsl");
+        char *f_source = platform.platform_read_entire_file("shader/cube_f.glsl");
+        struct Shader main_shader = shader_compile(v_source, f_source);
+        free(v_source);
+        free(f_source);
+        game_state->cube_shader = main_shader;
+    }
 
     glEnable(GL_DEPTH_TEST);
 

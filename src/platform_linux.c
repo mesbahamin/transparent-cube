@@ -10,6 +10,7 @@
 #include <GLFW/glfw3.h>
 
 #include "game.c"
+#include "platform.h"
 #include "platform_linux.h"
 
 void error_callback(int error, const char* description);
@@ -71,6 +72,8 @@ int main(void)
 #endif // USE_TEST_SEED
 
     struct GameState game_state = {0};
+    game_state.platform.platform_read_entire_file = &linux_read_entire_file;
+
     game_init(&game_state, PLATFORM_SCR_WIDTH, PLATFORM_SCR_HEIGHT);
 
 #ifdef PLATFORM_HOTLOAD_GAME_CODE
@@ -151,6 +154,42 @@ time_t file_get_modified_time(char *file_path)
     return mtime;
 }
 
+PLATFORM_READ_ENTIRE_FILE(linux_read_entire_file)
+{
+    FILE *handle = fopen(file_path, "r");
+    char *buffer = NULL;
+
+    if (handle)
+    {
+        // get file size
+        fseek(handle, 0, SEEK_END);
+        u32 num_bytes_in_file = ftell(handle);
+        rewind(handle);
+
+        // TODO: replace malloc with own allocator so I stop having nightmares
+        buffer = (char*) malloc(sizeof(char) * (num_bytes_in_file + 1) );
+
+        u32 bytes_read = fread(buffer, sizeof(char), num_bytes_in_file, handle);
+        // IMPORTANT! fread() doesn't add the '\0'
+        buffer[num_bytes_in_file] = '\0';
+
+        if (num_bytes_in_file != bytes_read)
+        {
+            free(buffer);
+            buffer = NULL;
+        }
+
+        fclose(handle);
+    }
+    else
+    {
+        printf("Error: Couldn't open file at path: %s", file_path);
+        // TODO: handle errors here in a better way
+        exit(1);
+    }
+
+    return buffer;
+}
 
 #ifdef PLATFORM_HOTLOAD_GAME_CODE
 void unload_game_code(struct GameCode *game_code)

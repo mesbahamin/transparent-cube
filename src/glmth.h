@@ -95,16 +95,14 @@ static inline m4 glmth_m4_init_id(void)
     return m;
 }
 
-static inline f32 *glmth_m4_valueptr(m4 m)
+static inline void glmth_m4_valueptr(m4 m, f32* out_valueptr)
 {
-    f32 *values = malloc(sizeof(m4));
     for (u8 v = 0; v < 16; ++v)
     {
         u8 row = v / 4;
         u8 col = v % 4;
-        values[v] = m.E[row][col];
+        out_valueptr[v] = m.E[row][col];
     }
-    return values;
 }
 
 static inline m4 glmth_m4m4_m(m4 mat1, m4 mat2)
