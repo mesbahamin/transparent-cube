@@ -10,41 +10,12 @@
 #include "glad/glad.h"
 #endif
 
-
 #ifdef PLATFORM_HOTLOAD_GAME_CODE
 void game_load_opengl_symbols(void)
 {
     gladLoadGL();
 }
 #endif
-
-
-float wrap(float n, float min, float max)
-{
-    if (n > max)
-    {
-        return min;
-    }
-    else if (n < min)
-    {
-        return max;
-    }
-    else
-    {
-        return n;
-    }
-}
-
-
-float randf(float min, float max)
-{
-    assert(min < max);
-    float random = ((float) rand()) / (float) RAND_MAX;
-    float diff = max - min;
-    float r = random * diff;
-    return min + r;
-}
-
 
 void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t screen_height)
 {
@@ -109,7 +80,6 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
 #endif
 }
 
-
 void game_update_and_render(struct GameState *game_state, float dt, uint32_t screen_width, uint32_t screen_height)
 {
     glDepthMask(GL_TRUE);
@@ -156,7 +126,6 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
         glDisable(GL_BLEND);
     }
 }
-
 
 void game_cleanup(struct GameState *game_state)
 {
