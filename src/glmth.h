@@ -92,7 +92,7 @@ typedef struct
 } m4;
 
 
-m4 glmth_m4_init_id();
+m4 glmth_m4_init_id(void);
 void glmth_m4_print(m4 m);
 f32 *glmth_m4_valueptr(m4 m);
 bool glmth_m4m4_eq(m4 mat1, m4 mat2);
