@@ -1,24 +1,16 @@
 #include "game.h"
 
-// TODO: remove references to emscripten
-#ifndef __EMSCRIPTEN__
+#ifndef GAME_WEBGL
 #include "glad.c"
 #endif
 
 #include "shader.c"
 
-#ifdef PLATFORM_HOTLOAD_GAME_CODE
-void game_load_opengl_symbols(void)
-{
-    gladLoadGL();
-}
-#endif
-
 void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t screen_height)
 {
     // load cube vertex data
     {
-        GLfloat cube_vertices[] = {
+        f32 cube_vertices[] = {
              // positions         // colors
             -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,
             -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
@@ -30,7 +22,7 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
              0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,
         };
 
-        GLuint elements[] = {
+        u32 elements[] = {
             0, 4, 6, 6, 2, 0,
             1, 5, 7, 7, 3, 1,
             3, 2, 0, 0, 1, 3,
@@ -39,11 +31,11 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
             2, 6, 7, 7, 3, 2,
         };
 
-        GLuint cube_vao;
+        u32 cube_vao;
         glGenVertexArrays(1, &cube_vao);
         glBindVertexArray(cube_vao);
 
-        GLuint cube_vbo;
+        u32 cube_vbo;
         glGenBuffers(1, &cube_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
@@ -55,7 +47,7 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(*cube_vertices), (GLvoid*)(3 * sizeof(*cube_vertices)));
         glEnableVertexAttribArray(1);
 
-        GLuint cube_ebo;
+        u32 cube_ebo;
         glGenBuffers(1, &cube_ebo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
@@ -71,8 +63,7 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
 
     glEnable(GL_DEPTH_TEST);
 
-    // TODO: remove references to emscripten
-#ifndef __EMSCRIPTEN__
+#ifndef GAME_WEBGL
     glEnable(GL_MULTISAMPLE);
 #endif
 }
@@ -130,3 +121,10 @@ void game_cleanup(struct GameState *game_state)
     glDeleteBuffers(1, &game_state->cube_vbo);
     glDeleteBuffers(1, &game_state->cube_ebo);
 }
+
+#ifdef PLATFORM_HOTLOAD_GAME_CODE
+void game_load_opengl_symbols(void)
+{
+    gladLoadGL();
+}
+#endif

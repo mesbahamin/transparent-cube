@@ -2,7 +2,7 @@
 
 struct Shader
 {
-    uint32_t program;
+    u32 program;
 };
 
 char *read_file(char *file_path);

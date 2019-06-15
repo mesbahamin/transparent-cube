@@ -7,24 +7,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// TODO: remove references to emscripten
-#ifdef __EMSCRIPTEN__
-#include <GLES3/gl3.h>
+#include "glmth.h"
+
+#ifdef GAME_WEBGL
+#include "webgl.h"
 #else
 #include "glad/glad.h"
 #endif
 
-#include "glmth.h"
 #include "shader.h"
-
 
 struct GameState
 {
-    GLuint cube_vao;
-    GLuint cube_vbo;
-    GLuint cube_ebo;
+    u32 cube_vao;
+    u32 cube_vbo;
+    u32 cube_ebo;
     struct Shader cube_shader;
 };
+
+typedef void (game_update_and_render_func)(struct GameState *game_state, float dt, u32 screen_width, u32 screen_height);
+void game_update_and_render(struct GameState *game_state, float dt, u32 screen_width, u32 screen_height);
+
+void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height);
+void game_cleanup(struct GameState *game_state);
 
 #ifdef PLATFORM_HOTLOAD_GAME_CODE
 // We need to call this from the platform layer in order for the game, when
@@ -33,9 +38,3 @@ struct GameState
 typedef void (game_load_opengl_symbols_func)(void);
 void game_load_opengl_symbols(void);
 #endif // PLATFORM_HOTLOAD_GAME_CODE
-
-typedef void (game_update_and_render_func)(struct GameState *game_state, float dt, uint32_t screen_width, uint32_t screen_height);
-void game_update_and_render(struct GameState *game_state, float dt, uint32_t screen_width, uint32_t screen_height);
-
-void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t screen_height);
-void game_cleanup(struct GameState *game_state);

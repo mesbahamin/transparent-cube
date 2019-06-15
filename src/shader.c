@@ -9,12 +9,12 @@ char *read_file(char *file_path)
     {
         // get file size
         fseek(handle, 0, SEEK_END);
-        uint32_t num_bytes_in_file = ftell(handle);
+        u32 num_bytes_in_file = ftell(handle);
         rewind(handle);
 
         buffer = (char*) malloc(sizeof(char) * (num_bytes_in_file + 1) );
 
-        uint32_t bytes_read = fread(buffer, sizeof(char), num_bytes_in_file, handle);
+        u32 bytes_read = fread(buffer, sizeof(char), num_bytes_in_file, handle);
         // IMPORTANT! fread() doesn't add the '\0'
         buffer[num_bytes_in_file] = '\0';
 
@@ -40,10 +40,10 @@ struct Shader shader_compile(char *vertex_path, char *fragment_path)
     const GLchar *vertex_shader_source = read_file(vertex_path);
     const GLchar *fragment_shader_source = read_file(fragment_path);
 
-    GLint success;
-    GLchar info_log[512];
+    i32 success;
+    char info_log[512];
 
-    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    u32 vertex_shader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex_shader, 1, &vertex_shader_source, NULL);
     glCompileShader(vertex_shader);
     glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
@@ -53,7 +53,7 @@ struct Shader shader_compile(char *vertex_path, char *fragment_path)
         printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n %s\n", info_log);
     }
 
-    GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    u32 fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, &fragment_shader_source, NULL);
     glCompileShader(fragment_shader);
     glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
