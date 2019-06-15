@@ -1,5 +1,3 @@
-#include "platform_emscripten.h"
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,6 +8,8 @@
 #define GLFW_INCLUDE_ES3
 #include <GLFW/glfw3.h>
 
+#include "game.c"
+#include "platform_emscripten.h"
 
 void error_callback(int error, const char *description);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);

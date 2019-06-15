@@ -1,5 +1,3 @@
-#include "platform_linux.h"
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -11,6 +9,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "game.c"
+#include "platform_linux.h"
 
 void error_callback(int error, const char* description);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);

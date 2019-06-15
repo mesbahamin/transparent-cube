@@ -4,6 +4,6 @@
 *.bc
 *.o
 
-build/*
+out/*
 
 tags

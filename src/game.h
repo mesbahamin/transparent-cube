@@ -7,14 +7,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "glmth.h"
-
 #ifdef GAME_WEBGL
 #include "webgl.h"
 #else
 #include "glad/glad.h"
 #endif
 
+#include "glmth.h"
 #include "shader.h"
 
 struct GameState

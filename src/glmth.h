@@ -85,7 +85,7 @@ typedef struct
     f32 E[4][4]; // E[row][column]
 } m4;
 
-inline m4 glmth_m4_init_id(void)
+static inline m4 glmth_m4_init_id(void)
 {
     m4 m = { 0 };
     m.E[0][0] = 1.0f;
@@ -95,7 +95,7 @@ inline m4 glmth_m4_init_id(void)
     return m;
 }
 
-inline f32 *glmth_m4_valueptr(m4 m)
+static inline f32 *glmth_m4_valueptr(m4 m)
 {
     f32 *values = malloc(sizeof(m4));
     for (u8 v = 0; v < 16; ++v)
@@ -107,7 +107,7 @@ inline f32 *glmth_m4_valueptr(m4 m)
     return values;
 }
 
-inline m4 glmth_m4m4_m(m4 mat1, m4 mat2)
+static inline m4 glmth_m4m4_m(m4 mat1, m4 mat2)
 {
     m4 r = {
         .E[0][0] = (mat1.E[0][0] * mat2.E[0][0]) + (mat1.E[0][1] * mat2.E[1][0]) + (mat1.E[0][2] * mat2.E[2][0]) + (mat1.E[0][3] * mat2.E[3][0]),
@@ -133,30 +133,30 @@ inline m4 glmth_m4m4_m(m4 mat1, m4 mat2)
     return r;
 }
 
-inline v3 glmth_v3_init(f32 x, f32 y, f32 z)
+static inline v3 glmth_v3_init(f32 x, f32 y, f32 z)
 {
     v3 v = { .x = x, .y = y, .z = z };
     return v;
 }
 
-inline f32 glmth_v3_length(v3 v)
+static inline f32 glmth_v3_length(v3 v)
 {
     return sqrtf((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
 }
 
-inline v3 glmth_v3_normalize(v3 v)
+static inline v3 glmth_v3_normalize(v3 v)
 {
     f32 l = glmth_v3_length(v);
     v3 r = glmth_v3_init(v.x / l, v.y / l, v.z / l);
     return r;
 }
 
-inline f32 glmth_rad(f32 deg)
+static inline f32 glmth_rad(f32 deg)
 {
     return deg * (M_PI / 180.0f);
 }
 
-inline m4 glmth_rotate(m4 m, f32 rad, v3 axis)
+static inline m4 glmth_rotate(m4 m, f32 rad, v3 axis)
 {
     axis = glmth_v3_normalize(axis);
 
@@ -180,7 +180,7 @@ inline m4 glmth_rotate(m4 m, f32 rad, v3 axis)
     return glmth_m4m4_m(m, r);
 }
 
-inline m4 glmth_translate(m4 m, v3 v)
+static inline m4 glmth_translate(m4 m, v3 v)
 {
     m4 r = glmth_m4_init_id();
     r.E[0][3] = v.x;
@@ -189,7 +189,7 @@ inline m4 glmth_translate(m4 m, v3 v)
     return glmth_m4m4_m(m, r);
 }
 
-inline m4 glmth_projection_perspective(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far)
+static inline m4 glmth_projection_perspective(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far)
 {
     assert(left != right);
     assert(bottom != top);
@@ -220,7 +220,7 @@ inline m4 glmth_projection_perspective(f32 left, f32 right, f32 bottom, f32 top,
     return r;
 }
 
-inline m4 glmth_projection_perspective_fov(f32 fovy, f32 aspect, f32 near, f32 far)
+static inline m4 glmth_projection_perspective_fov(f32 fovy, f32 aspect, f32 near, f32 far)
 {
     f32 half_height = tanf(fovy / 2.0f) * near;
     f32 half_width = half_height * aspect;

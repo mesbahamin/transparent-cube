@@ -2,7 +2,7 @@ CC = clang
 CFLAGS = -std=c99 -Ilib -Wall -Wextra -Wshadow -Wswitch-enum -Wno-unused-parameter -Wno-missing-braces
 LDFLAGS = -ldl -lglfw -lGL -lm
 
-SRC_FILES = game.c platform_linux.c
+SRC_FILES = platform_linux.c
 SRC = $(addprefix src/, $(SRC_FILES))
 EXE_FILE = quaternion_demo
 
@@ -10,19 +10,19 @@ LIB_FILES = game.c
 LIB = $(addprefix src/, $(LIB_FILES))
 LIB_NAME = game.so
 
-DBGDIR = build/debug
+DBGDIR = out/debug
 DBGEXE = $(DBGDIR)/$(EXE_FILE)
 DBGCFLAGS = -g -Og -Werror
 
-RELDIR = build/release
+RELDIR = out/release
 RELEXE = $(RELDIR)/$(EXE_FILE)
 RELLIB = $(RELDIR)/$(LIB_NAME)
 RELLIBTMP = $(RELLIB).tmp
 RELCFLAGS = -DPLATFORM_HOTLOAD_GAME_CODE -O2 -Os
 
-EMS_FILES = game.c platform_emscripten.c
+EMS_FILES = platform_emscripten.c
 EMSSRC = $(addprefix src/, $(EMS_FILES))
-EMSDIR = build/emscripten
+EMSDIR = out/emscripten
 EMSEXE = $(EMSDIR)/$(EXE_FILE).html
 EMSCFLAGS = --preload-file shader -s USE_GLFW=3 -s USE_WEBGL2=1
 
@@ -46,7 +46,7 @@ clean:
 	rm -f $(RELDIR)/* $(DBGDIR)/*
 
 debug: build_debug
-	cgdb $(DBGEXE)
+	gdb $(DBGEXE)
 
 dir_debug:
 	@mkdir -p $(DBGDIR)

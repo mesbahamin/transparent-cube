@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <time.h>
 
-#include "game.h"
-
 #define PLATFORM_SCR_WIDTH 600
 #define PLATFORM_SCR_HEIGHT 600
 
@@ -16,7 +14,7 @@
 #define PLATFORM_MS_PER_UPDATE (PLATFORM_SECOND / PLATFORM_UPDATES_PER_SECOND)
 
 #ifdef PLATFORM_HOTLOAD_GAME_CODE
-#define PLATFORM_GAME_LIB_PATH "./build/release/game.so"
+#define PLATFORM_GAME_LIB_PATH "./out/release/game.so"
 struct GameCode
 {
     bool is_valid;
