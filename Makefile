@@ -2,11 +2,11 @@ CC = clang
 CFLAGS = -std=c99 -Ilib -Wall -Wextra -Wshadow -Wswitch-enum -Wno-unused-parameter -Wno-missing-braces
 LDFLAGS = -ldl -lglfw -lGL -lm
 
-SRC_FILES = game.c glad.c glmth.c platform_linux.c shader.c
+SRC_FILES = game.c glad.c platform_linux.c shader.c
 SRC = $(addprefix src/, $(SRC_FILES))
 EXE_FILE = quaternion_demo
 
-LIB_FILES = game.c glad.c glmth.c shader.c
+LIB_FILES = game.c glad.c shader.c
 LIB = $(addprefix src/, $(LIB_FILES))
 LIB_NAME = game.so
 
@@ -20,7 +20,7 @@ RELLIB = $(RELDIR)/$(LIB_NAME)
 RELLIBTMP = $(RELLIB).tmp
 RELCFLAGS = -DPLATFORM_HOTLOAD_GAME_CODE -O2 -Os
 
-EMS_FILES = game.c glmth.c platform_emscripten.c shader.c
+EMS_FILES = game.c platform_emscripten.c shader.c
 EMSSRC = $(addprefix src/, $(EMS_FILES))
 EMSDIR = build/emscripten
 EMSEXE = $(EMSDIR)/$(EXE_FILE).html

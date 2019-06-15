@@ -5,6 +5,8 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265359f
@@ -91,38 +93,151 @@ typedef struct
     f32 E[4][4]; // E[row][column]
 } m4;
 
+inline m4 glmth_m4_init_id(void)
+{
+    m4 m = { 0 };
+    m.E[0][0] = 1.0f;
+    m.E[1][1] = 1.0f;
+    m.E[2][2] = 1.0f;
+    m.E[3][3] = 1.0f;
+    return m;
+}
 
-m4 glmth_m4_init_id(void);
-void glmth_m4_print(m4 m);
-f32 *glmth_m4_valueptr(m4 m);
-bool glmth_m4m4_eq(m4 mat1, m4 mat2);
-m4 glmth_m4m4_m(m4 mat1, m4 mat2);
-v4 glmth_m4v4_m(m4 m, v4 v);
-v3 glmth_v3_cross(v3 vec1, v3 vec2);
-v3 glmth_v3_init(f32 x, f32 y, f32 z);
-v3 glmth_v3_init_f(f32 f);
-f32 glmth_v3_length(v3 v);
-v3 glmth_v3f_m(v3 v, f32 s);
-v3 glmth_v3_negate(v3 v);
-v3 glmth_v3_normalize(v3 v);
-void glmth_v3_print(v3 v);
-v3 glmth_v3_a(v3 vec1, v3 vec2);
-v3 glmth_v3_s(v3 vec1, v3 vec2);
-void glmth_v4_print(v4 v);
-bool glmth_v4v4_eq(v4 vec1, v4 vec2);
-void glmth_clampf(float *f, float min, float max);
-f32 glmth_deg(f32 rad);
-float glmth_lerpf(float f, float min, float max);
-f32 glmth_rad(f32 deg);
-m4 glmth_rotate_x(m4 m, f32 rad);
-m4 glmth_rotate_y(m4 m, f32 rad);
-m4 glmth_rotate_z(m4 m, f32 rad);
-m4 glmth_rotate(m4 m, f32 rad, v3 axis);
-m4 glmth_scale(m4 m, v3 v);
-m4 glmth_translate(m4 m, v3 v);
-m4 glmth_projection_ortho(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far);
-m4 glmth_projection_perspective(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far);
-m4 glmth_projection_perspective_fov(f32 fovy, f32 aspect, f32 near, f32 far);
-m4 glmth_camera_look_at(v3 camera_pos, v3 camera_target, v3 up);
+inline f32 *glmth_m4_valueptr(m4 m)
+{
+    f32 *values = malloc(sizeof(m4));
+    for (u8 v = 0; v < 16; ++v)
+    {
+        u8 row = v / 4;
+        u8 col = v % 4;
+        values[v] = m.E[row][col];
+    }
+    return values;
+}
+
+inline m4 glmth_m4m4_m(m4 mat1, m4 mat2)
+{
+    m4 r = {
+        .E[0][0] = (mat1.E[0][0] * mat2.E[0][0]) + (mat1.E[0][1] * mat2.E[1][0]) + (mat1.E[0][2] * mat2.E[2][0]) + (mat1.E[0][3] * mat2.E[3][0]),
+        .E[0][1] = (mat1.E[0][0] * mat2.E[0][1]) + (mat1.E[0][1] * mat2.E[1][1]) + (mat1.E[0][2] * mat2.E[2][1]) + (mat1.E[0][3] * mat2.E[3][1]),
+        .E[0][2] = (mat1.E[0][0] * mat2.E[0][2]) + (mat1.E[0][1] * mat2.E[1][2]) + (mat1.E[0][2] * mat2.E[2][2]) + (mat1.E[0][3] * mat2.E[3][2]),
+        .E[0][3] = (mat1.E[0][0] * mat2.E[0][3]) + (mat1.E[0][1] * mat2.E[1][3]) + (mat1.E[0][2] * mat2.E[2][3]) + (mat1.E[0][3] * mat2.E[3][3]),
+
+        .E[1][0] = (mat1.E[1][0] * mat2.E[0][0]) + (mat1.E[1][1] * mat2.E[1][0]) + (mat1.E[1][2] * mat2.E[2][0]) + (mat1.E[1][3] * mat2.E[3][0]),
+        .E[1][1] = (mat1.E[1][0] * mat2.E[0][1]) + (mat1.E[1][1] * mat2.E[1][1]) + (mat1.E[1][2] * mat2.E[2][1]) + (mat1.E[1][3] * mat2.E[3][1]),
+        .E[1][2] = (mat1.E[1][0] * mat2.E[0][2]) + (mat1.E[1][1] * mat2.E[1][2]) + (mat1.E[1][2] * mat2.E[2][2]) + (mat1.E[1][3] * mat2.E[3][2]),
+        .E[1][3] = (mat1.E[1][0] * mat2.E[0][3]) + (mat1.E[1][1] * mat2.E[1][3]) + (mat1.E[1][2] * mat2.E[2][3]) + (mat1.E[1][3] * mat2.E[3][3]),
+
+        .E[2][0] = (mat1.E[2][0] * mat2.E[0][0]) + (mat1.E[2][1] * mat2.E[1][0]) + (mat1.E[2][2] * mat2.E[2][0]) + (mat1.E[2][3] * mat2.E[3][0]),
+        .E[2][1] = (mat1.E[2][0] * mat2.E[0][1]) + (mat1.E[2][1] * mat2.E[1][1]) + (mat1.E[2][2] * mat2.E[2][1]) + (mat1.E[2][3] * mat2.E[3][1]),
+        .E[2][2] = (mat1.E[2][0] * mat2.E[0][2]) + (mat1.E[2][1] * mat2.E[1][2]) + (mat1.E[2][2] * mat2.E[2][2]) + (mat1.E[2][3] * mat2.E[3][2]),
+        .E[2][3] = (mat1.E[2][0] * mat2.E[0][3]) + (mat1.E[2][1] * mat2.E[1][3]) + (mat1.E[2][2] * mat2.E[2][3]) + (mat1.E[2][3] * mat2.E[3][3]),
+
+        .E[3][0] = (mat1.E[3][0] * mat2.E[0][0]) + (mat1.E[3][1] * mat2.E[1][0]) + (mat1.E[3][2] * mat2.E[2][0]) + (mat1.E[3][3] * mat2.E[3][0]),
+        .E[3][1] = (mat1.E[3][0] * mat2.E[0][1]) + (mat1.E[3][1] * mat2.E[1][1]) + (mat1.E[3][2] * mat2.E[2][1]) + (mat1.E[3][3] * mat2.E[3][1]),
+        .E[3][2] = (mat1.E[3][0] * mat2.E[0][2]) + (mat1.E[3][1] * mat2.E[1][2]) + (mat1.E[3][2] * mat2.E[2][2]) + (mat1.E[3][3] * mat2.E[3][2]),
+        .E[3][3] = (mat1.E[3][0] * mat2.E[0][3]) + (mat1.E[3][1] * mat2.E[1][3]) + (mat1.E[3][2] * mat2.E[2][3]) + (mat1.E[3][3] * mat2.E[3][3]),
+    };
+    return r;
+}
+
+inline v3 glmth_v3_init(f32 x, f32 y, f32 z)
+{
+    v3 v = { .x = x, .y = y, .z = z };
+    return v;
+}
+
+inline f32 glmth_v3_length(v3 v)
+{
+    return sqrtf((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+}
+
+inline v3 glmth_v3_normalize(v3 v)
+{
+    f32 l = glmth_v3_length(v);
+    v3 r = glmth_v3_init(v.x / l, v.y / l, v.z / l);
+    return r;
+}
+
+inline f32 glmth_rad(f32 deg)
+{
+    return deg * (M_PI / 180.0f);
+}
+
+inline m4 glmth_rotate(m4 m, f32 rad, v3 axis)
+{
+    axis = glmth_v3_normalize(axis);
+
+    f32 c = cosf(rad);
+    f32 s = sinf(rad);
+
+    m4 r = glmth_m4_init_id();
+
+    r.E[0][0] = c + (powf(axis.x, 2.0f) * (1 - c));
+    r.E[0][1] = (axis.x * axis.y * (1 - c)) - (axis.z * s);
+    r.E[0][2] = (axis.x * axis.z * (1 - c)) + (axis.y * s);
+
+    r.E[1][0] = (axis.y * axis.x * (1 - c)) + (axis.z * s);
+    r.E[1][1] = c + (powf(axis.y, 2.0f) * (1 - c));
+    r.E[1][2] = (axis.y * axis.z * (1 - c)) - (axis.x * s);
+
+    r.E[2][0] = (axis.z * axis.x * (1 - c)) - (axis.y * s);
+    r.E[2][1] = (axis.z * axis.y * (1 - c)) + (axis.x * s);
+    r.E[2][2] = c + (powf(axis.z, 2.0f) * (1 - c));
+
+    return glmth_m4m4_m(m, r);
+}
+
+inline m4 glmth_translate(m4 m, v3 v)
+{
+    m4 r = glmth_m4_init_id();
+    r.E[0][3] = v.x;
+    r.E[1][3] = v.y;
+    r.E[2][3] = v.z;
+    return glmth_m4m4_m(m, r);
+}
+
+inline m4 glmth_projection_perspective(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far)
+{
+    assert(left != right);
+    assert(bottom != top);
+    assert(near != far);
+
+    m4 r = glmth_m4_init_id();
+
+    r.E[0][0] = (2.0f * near) / (right - left);
+    r.E[0][1] = 0.0f;
+    r.E[0][2] = (right + left) / (right - left);
+    r.E[0][3] = 0.0f;
+
+    r.E[1][0] = 0.0f;
+    r.E[1][1] = (2.0f * near) / (top - bottom);
+    r.E[1][2] = (top + bottom) / (top - bottom);
+    r.E[1][3] = 0.0f;
+
+    r.E[2][0] = 0.0f;
+    r.E[2][1] = 0.0f;
+    r.E[2][2] = -(far + near) / (far - near);
+    r.E[2][3] = (-2.0f * far * near) / (far - near);
+
+    r.E[3][0] = 0.0f;
+    r.E[3][1] = 0.0f;
+    r.E[3][2] = -1.0f;
+    r.E[3][3] = 0.0f;
+
+    return r;
+}
+
+inline m4 glmth_projection_perspective_fov(f32 fovy, f32 aspect, f32 near, f32 far)
+{
+    f32 half_height = tanf(fovy / 2.0f) * near;
+    f32 half_width = half_height * aspect;
+    f32 left = -half_width;
+    f32 right = half_width;
+    f32 bottom = -half_height;
+    f32 top = half_height;
+
+    return glmth_projection_perspective(left, right, bottom, top, near, far);
+}
 
 #endif
