@@ -3,7 +3,7 @@ struct Shader
     u32 program;
 };
 
-struct Shader shader_compile(const GLchar *vertex_shader_source, const GLchar *fragment_shader_source);
+bool shader_compile(const GLchar *vertex_shader_source, const GLchar *fragment_shader_source, struct Shader *compiled_shader);
 void shader_use(struct Shader *s);
 void shader_setb(struct Shader *s, char *name, bool value);
 void shader_seti(struct Shader *s, char *name, int value);

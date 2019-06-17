@@ -3,5 +3,15 @@ clang -cc1 -Ofast -emit-llvm-bc -triple=wasm32-unknown-unknown-unknown-wasm -std
     -DGAME_WEBGL \
     src/game.c
 llvm-link -o wasm.bc src/*.bc
-llc -O3 -filetype=obj wasm.bc -o wasm.o
+opt -O3 -disable-simplify-libcalls wasm.bc -o wasm.bc
+llc -O3 -disable-simplify-libcalls -filetype=obj wasm.bc -o wasm.o
 wasm-ld --no-entry wasm.o -o binary.wasm --strip-all -allow-undefined-file wasm_js_implemented_symbols.txt --import-memory
+
+#clang \
+#  --target=wasm32 \
+#  -emit-llvm \
+#  -fno-builtin \
+#  -c \
+#  -S \
+#  -DGAME_WEBGL \
+#  src/game.c

@@ -14,6 +14,8 @@
 #define PLATFORM_MS_PER_UPDATE (PLATFORM_SECOND / PLATFORM_UPDATES_PER_SECOND)
 
 PLATFORM_READ_ENTIRE_FILE(linux_read_entire_file);
+PLATFORM_PRINT(linux_print);
+PLATFORM_MEMORY_FREE(linux_memory_free);
 
 #ifdef PLATFORM_HOTLOAD_GAME_CODE
 #define PLATFORM_GAME_LIB_PATH "./out/release/game.so"

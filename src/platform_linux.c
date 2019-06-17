@@ -73,6 +73,8 @@ int main(void)
 
     struct GameState game_state = {0};
     game_state.platform.platform_read_entire_file = &linux_read_entire_file;
+    game_state.platform.platform_print = &linux_print;
+    game_state.platform.platform_memory_free = &linux_memory_free;
 
     game_init(&game_state, PLATFORM_SCR_WIDTH, PLATFORM_SCR_HEIGHT);
 
@@ -152,6 +154,20 @@ time_t file_get_modified_time(char *file_path)
         fprintf(stderr, "ERROR: Failed to stat file: %s\n", file_path);
     }
     return mtime;
+}
+
+PLATFORM_MEMORY_FREE(linux_memory_free)
+{
+    free(ptr);
+}
+
+PLATFORM_PRINT(linux_print)
+{
+    va_list args;
+    va_start(args, format);
+    int num_chars_printed = vprintf(format, args);
+    va_end(args);
+    return num_chars_printed;
 }
 
 PLATFORM_READ_ENTIRE_FILE(linux_read_entire_file)

@@ -6,7 +6,7 @@
 
 #include "shader.c"
 
-void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t screen_height)
+void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height)
 {
     // load cube vertex data
     {
@@ -64,9 +64,12 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
         struct PlatformApi platform = game_state->platform;
         char *v_source = platform.platform_read_entire_file("shader/cube_v.glsl");
         char *f_source = platform.platform_read_entire_file("shader/cube_f.glsl");
-        struct Shader main_shader = shader_compile(v_source, f_source);
-        free(v_source);
-        free(f_source);
+        print = platform.platform_print;
+        struct Shader main_shader = {0};
+        // TODO: Check this result
+        shader_compile(v_source, f_source, &main_shader);
+        platform.platform_memory_free(v_source);
+        platform.platform_memory_free(f_source);
         game_state->cube_shader = main_shader;
     }
 
@@ -77,7 +80,7 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
 #endif
 }
 
-void game_update_and_render(struct GameState *game_state, float dt, uint32_t screen_width, uint32_t screen_height)
+void game_update_and_render(struct GameState *game_state, float dt, u32 screen_width, u32 screen_height)
 {
     glDepthMask(GL_TRUE);
     glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
