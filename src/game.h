@@ -1,29 +1,38 @@
 #pragma once
 
-// TODO: Clean up
-#ifndef __has_builtin
-#define __has_builtin(x) 0
-#endif
-
 #include <stddef.h>
 #include <stdint.h>
 #define static_assert _Static_assert
-
-static_assert(__has_builtin(__builtin_cosf), "cosf");
-static_assert(__has_builtin(__builtin_sinf), "sinf");
-static_assert(__has_builtin(__builtin_tanf), "tanf");
-static_assert(__has_builtin(__builtin_sqrtf), "sqrtf");
-static_assert(__has_builtin(__builtin_powf), "powf");
-#define cosf __builtin_cosf
-#define sinf __builtin_sinf
-#define tanf __builtin_tanf
-#define sqrtf __builtin_sqrtf
-#define powf __builtin_powf
 
 #define NULL ((void*)0)
 
 // TODO: fix this
 #define assert(x) (void)0
+
+inline float sinf(float a)
+{
+    return a;
+}
+
+inline float cosf(float a)
+{
+    return a;
+}
+
+inline float powf(float x, float p)
+{
+    return x;
+}
+
+inline float sqrtf(float a)
+{
+    return a;
+}
+
+inline float tanf(float a)
+{
+    return a;
+}
 
 typedef _Bool bool;
 #define true 1

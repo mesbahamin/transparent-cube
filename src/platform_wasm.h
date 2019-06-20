@@ -1,0 +1,6 @@
+#define PLATFORM_SCR_WIDTH 600
+#define PLATFORM_SCR_HEIGHT 600
+
+PLATFORM_READ_ENTIRE_FILE(wasm_read_entire_file);
+PLATFORM_PRINT(wasm_print);
+PLATFORM_MEMORY_FREE(wasm_memory_free);

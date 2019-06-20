@@ -6,7 +6,7 @@ typedef double f64;
 
 // NOTE(amin): Since these functions will be implemented in javascript, we can
 // only use i32, f32, and f64 params.
-void webglAttachShader(i32 shader, i32 program);
+void webglAttachShader(i32 program, i32 shader);
 void webglBindBuffer(i32 target, i32 buffer);
 void webglBindVertexArray(i32 vao);
 void webglBlendColor(f32 r, f32 g, f32 b, f32 a);
@@ -15,25 +15,25 @@ void webglBufferData(i32 target, i32 size, i32 data, i32 usage);
 void webglClear(i32 mask);
 void webglClearColor(f32 r, f32 g, f32 b, f32 a);
 void webglCompileShader(i32 shader);
+i32  webglCreateBuffer(void);
 i32  webglCreateProgram(void);
 i32  webglCreateShader(i32 type);
-void webglDeleteBuffers(i32 bo);
+i32  webglCreateVertexArray(void);
+void webglDeleteBuffer(i32 bo);
 void webglDeleteShader(i32 shader);
-void webglDeleteVertexArrays(i32 vao);
-void webglDepthMask(i32 b);
+void webglDeleteVertexArray(i32 vao);
+void webglDepthMask(i32 flag);
 void webglDisable(i32 cap);
 void webglDrawElements(i32 mode, i32 count, i32 type, i32 offset);
 void webglEnable(i32 cap);
 void webglEnableVertexAttribArray(i32 index);
-void webglGenBuffers(i32 n, i32 buffers);
-void webglGenVertexArrays(i32 n, i32 arrays);
 void webglGetProgramInfoLog(void);
-int  webglGetProgramiv(i32 program, i32 param);
-void webglGetShaderInfoLog(void);
-int  webglGetShaderiv(i32 shader, i32 param);
+int  webglGetProgramParameter(i32 program, i32 param);
+void webglGetShaderInfoLog(i32 shader, char *out_buf);
+int  webglGetShaderParameter(i32 shader, i32 param);
 i32  webglGetUniformLocation(i32 program, const char name[static 1], i32 name_len);
 void webglLinkProgram(i32 program);
-void webglShaderSource(i32 shader, i32 count, const char source[static 1], i32 source_len);
+void webglShaderSource(i32 shader, const char source[static 1], i32 source_len);
 void webglUniform1f(i32 location, f32 value);
 void webglUniform1i(i32 location, i32 value);
 void webglUniform3f(i32 location, f32 x, f32 y, f32 z);
@@ -141,9 +141,9 @@ inline GLuint glCreateShader(GLenum type)
 
 inline void glDeleteBuffers(GLsizei n, const GLuint *buffers)
 {
-    // TODO: assert n == 1
+    assert(n == 1);
     i32 the_buffer = WEBGL_CAST_I32(buffers[0]);
-    webglDeleteBuffers(the_buffer);
+    webglDeleteBuffer(the_buffer);
 }
 
 inline void glDeleteShader(GLuint shader)
@@ -153,9 +153,9 @@ inline void glDeleteShader(GLuint shader)
 
 inline void glDeleteVertexArrays(GLsizei n, const GLuint *arrays)
 {
-    // TODO: assert n == 1
+    assert(n == 1);
     i32 the_array = WEBGL_CAST_I32(arrays[0]);
-    webglDeleteVertexArrays(the_array);
+    webglDeleteVertexArray(the_array);
 }
 
 inline void glDepthMask(GLboolean flag)
@@ -185,12 +185,18 @@ inline void glEnableVertexAttribArray(GLuint index)
 
 inline void glGenBuffers(GLsizei n, GLuint *buffers)
 {
-    webglGenBuffers(WEBGL_CAST_I32(n), WEBGL_CAST_I32(*buffers));
+    assert(n == 1);
+    i32 buffer_id = webglCreateBuffer();
+    assert(buffer_id >= 0);
+    *buffers = (GLuint)buffer_id;
 }
 
 inline void glGenVertexArrays(GLsizei n, GLuint *arrays)
 {
-    webglGenVertexArrays(WEBGL_CAST_I32(n), WEBGL_CAST_I32(*arrays));
+    assert(n == 1);
+    i32 vao_id = webglCreateVertexArray();
+    assert(vao_id >= 0);
+    *arrays = (GLuint)vao_id;
 }
 
 inline void glGetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog)
@@ -201,18 +207,17 @@ inline void glGetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei *length
 
 inline void glGetProgramiv(GLuint program, GLenum pname, GLint *params)
 {
-    *params = webglGetProgramiv(WEBGL_CAST_I32(program), WEBGL_CAST_I32(pname));
+    *params = webglGetProgramParameter(WEBGL_CAST_I32(program), WEBGL_CAST_I32(pname));
 }
 
 inline void glGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog)
 {
-    // TODO: implement
-    //webglGetShaderInfoLog
+    webglGetShaderInfoLog(WEBGL_CAST_I32(shader), infoLog);
 }
 
 inline void glGetShaderiv(GLuint shader, GLenum pname, GLint *params)
 {
-    *params = webglGetShaderiv(WEBGL_CAST_I32(shader), WEBGL_CAST_I32(pname));
+    *params = webglGetShaderParameter(WEBGL_CAST_I32(shader), WEBGL_CAST_I32(pname));
 }
 
 inline GLint glGetUniformLocation(GLuint program, const GLchar *name)
@@ -226,9 +231,11 @@ inline void glLinkProgram(GLuint program)
     webglLinkProgram(WEBGL_CAST_I32(program));
 }
 
-inline void glShaderSource(GLuint shader, GLsizei count, const GLchar *const*string, const GLint *length)
+inline void glShaderSource(GLuint shader, GLsizei count, const GLchar *const *string, const GLint *length)
 {
-    webglShaderSource(WEBGL_CAST_I32(shader), WEBGL_CAST_I32(count), *string, WEBGL_CAST_I32(*length));
+    const GLchar *s = (void *)*string;
+    i32 l = _webgl_strlen(s);
+    webglShaderSource(WEBGL_CAST_I32(shader), s, l);
 }
 
 inline void glUniform1f(GLint location, GLfloat v0)
@@ -248,7 +255,7 @@ inline void glUniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
 
 inline void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
 {
-    webglUniformMatrix4fv(WEBGL_CAST_I32(location), value);
+    webglUniformMatrix4fv(WEBGL_CAST_I32(location), WEBGL_CAST_I32(value));
 }
 
 inline void glUseProgram(GLuint program)
