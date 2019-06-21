@@ -27,7 +27,7 @@ export bool init(void)
 export void render(void)
 {
     time += 16;
-    game_update_and_render(&g_game_state, time, g_width, g_height);
+    game_update_and_render(&g_game_state, time/1000.0f, 800, 600);
 }
 
 export void window_resize(int w, int h)

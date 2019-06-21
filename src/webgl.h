@@ -121,7 +121,7 @@ inline void glClear(GLbitfield mask)
 
 inline void glClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
 {
-    webglClearColor(WEBGL_CAST_I32(red), WEBGL_CAST_I32(green), WEBGL_CAST_I32(blue), WEBGL_CAST_I32(alpha));
+    webglClearColor((f32)red, (f32)green, (f32)blue, (f32)alpha);
 }
 
 inline void glCompileShader(GLuint shader)
