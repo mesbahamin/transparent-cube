@@ -106,7 +106,6 @@ void game_update_and_render(struct GameState *game_state, float dt, u32 screen_w
 
         shader_use(&game_state->cube_shader);
         shader_setm4(&game_state->cube_shader, "view", &view);
-        print("boooooooork");
         shader_setm4(&game_state->cube_shader, "projection", &projection);
 
         m4 model = glmth_m4_init_id();

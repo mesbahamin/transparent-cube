@@ -44,9 +44,9 @@ window.onload = async function() {
     }
 
     let binary = files[0];
-    imports['memory'] = new WebAssembly['Memory']({'initial':32});
+    imports['memory'] = new WebAssembly.Memory({'initial':32});
     memory = new Uint8Array(imports['memory']['buffer']);
-    let program = await WebAssembly['instantiate'](binary, {"env":imports});
+    let program = await WebAssembly.instantiate(binary, {"env":imports});
 
     let instance = program['instance'];
     exports = instance['exports'];
