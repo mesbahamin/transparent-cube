@@ -18,7 +18,7 @@ imports["webglBlendFunc"] = function(sfactor, dfactor) {
     gl.blendFunc(sfactor, dfactor);
 }
 imports["webglBufferData"] = function(target, size, data, usage) {
-    let dataslice = memory.subarray(data, data+length);
+    let dataslice = memory.subarray(data, data + size);
     gl.bufferData(target, dataslice, usage);
 }
 imports["webglClear"] = function(mask) {
