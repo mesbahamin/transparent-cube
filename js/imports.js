@@ -121,7 +121,7 @@ imports["webglShaderSource"] = function(shader_id, source_ptr, src_len) {
 }
 imports["webglUniform1f"] = function(location_id, value) {
     let loc = gl_id_map[location_id];
-    gl['uniform1i'](loc, value);
+    gl['uniform1f'](loc, value);
 }
 imports["webglUniform1i"] = function(location_id, value) {
     let loc = gl_id_map[location_id];
