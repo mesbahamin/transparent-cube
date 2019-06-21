@@ -131,7 +131,8 @@ inline void glCompileShader(GLuint shader)
 
 inline GLuint glCreateProgram(void)
 {
-    return webglCreateProgram();
+    i32 program_id = webglCreateProgram();
+    return (GLuint)program_id;
 }
 
 inline GLuint glCreateShader(GLenum type)
@@ -255,7 +256,7 @@ inline void glUniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
 
 inline void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
 {
-    webglUniformMatrix4fv(WEBGL_CAST_I32(location), WEBGL_CAST_I32(value));
+    webglUniformMatrix4fv(WEBGL_CAST_I32(location), value);
 }
 
 inline void glUseProgram(GLuint program)

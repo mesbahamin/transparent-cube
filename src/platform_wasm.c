@@ -15,7 +15,6 @@ i32 g_mem_buffer_i = 0;
 
 export bool init(void)
 {
-    struct GameState g_game_state = {0};
     g_game_state.platform.platform_read_entire_file = &wasm_read_entire_file;
     g_game_state.platform.platform_print = &wasm_print;
     g_game_state.platform.platform_memory_free = &wasm_memory_free;
