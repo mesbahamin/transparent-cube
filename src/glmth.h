@@ -156,7 +156,7 @@ static inline f32 glmth_rad(f32 deg)
 
 static inline m4 glmth_rotate(m4 m, f32 rad, v3 axis)
 {
-    axis = glmth_v3_normalize(axis);
+    //axis = glmth_v3_normalize(axis);
 
     f32 c = cosf(rad);
     f32 s = sinf(rad);
@@ -185,6 +185,38 @@ static inline m4 glmth_translate(m4 m, v3 v)
     r.E[1][3] = v.y;
     r.E[2][3] = v.z;
     return glmth_m4m4_m(m, r);
+}
+
+static inline m4 glmth_projection_ortho(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far)
+{
+    // TODO: This assert fails when you minimise the window in Windows.
+    assert(left != right);
+    assert(bottom != top);
+    assert(near != far);
+
+    m4 r = glmth_m4_init_id();
+
+    r.E[0][0] = 2.0f / (right - left);
+    r.E[0][1] = 0.0f;
+    r.E[0][2] = 0.0f;
+    r.E[0][3] = -(right + left) / (right - left);
+
+    r.E[1][0] = 0.0f;
+    r.E[1][1] = 2.0f / (top - bottom);
+    r.E[1][2] = 0.0f;
+    r.E[1][3] = -(top + bottom) / (top - bottom);
+
+    r.E[2][0] = 0.0f;
+    r.E[2][1] = 0.0f;
+    r.E[2][2] = -2.0f / (far - near);
+    r.E[2][3] = -(far + near) / (far - near);
+
+    r.E[3][0] = 0.0f;
+    r.E[3][1] = 0.0f;
+    r.E[3][2] = 0.0f;
+    r.E[3][3] = 1.0f;
+
+    return r;
 }
 
 static inline m4 glmth_projection_perspective(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far)

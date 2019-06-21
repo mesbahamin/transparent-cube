@@ -52,7 +52,6 @@ void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
-        glBindVertexArray(0);
 
         game_state->cube_vao = cube_vao;
         game_state->cube_vbo = cube_vbo;
@@ -91,7 +90,8 @@ void game_update_and_render(struct GameState *game_state, float dt, u32 screen_w
     m4 view = glmth_m4_init_id();
     m4 projection = glmth_m4_init_id();
     view = glmth_translate(view, glmth_v3_init(0.0f, 0.0f, -3.0f));
-    projection = glmth_projection_perspective_fov(glmth_rad(45.0f), (float)screen_width / (float)screen_height, 0.1f, 100.0f);
+    //projection = glmth_projection_perspective_fov(glmth_rad(45.0f), (float)screen_width / (float)screen_height, 0.1f, 100.0f);
+    projection = glmth_projection_ortho(0.0f, screen_width, 0.0f, screen_height, -10.0f, 10.0f);
 
     // render cube
     {
@@ -118,9 +118,7 @@ void game_update_and_render(struct GameState *game_state, float dt, u32 screen_w
         shader_setm4(&game_state->cube_shader, "model", &model);
         shader_setf(&game_state->cube_shader, "alpha", alpha);
 
-        glBindVertexArray(game_state->cube_vao);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
 
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);

@@ -9,29 +9,29 @@
 // TODO: fix this
 #define assert(x) (void)0
 
-inline float sinf(float a)
-{
-    return a;
-}
-
-inline float cosf(float a)
-{
-    return a;
-}
-
-inline float powf(float x, float p)
+inline float sinf(float x)
 {
     return x;
 }
 
+inline float cosf(float x)
+{
+    return x;
+}
+
+inline float powf(float x, float p)
+{
+    return x * x;
+}
+
 inline float sqrtf(float a)
 {
-    return a;
+    return a * 0.5f;
 }
 
 inline float tanf(float a)
 {
-    return a;
+    return 0.4142135623730950488f;
 }
 
 typedef _Bool bool;

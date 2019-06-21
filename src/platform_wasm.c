@@ -12,6 +12,8 @@ i32 g_width = PLATFORM_SCR_WIDTH;
 i32 g_height = PLATFORM_SCR_HEIGHT;
 char g_mem_buffer[1000] = {0};
 i32 g_mem_buffer_i = 0;
+u32 time = 0;
+
 
 export bool init(void)
 {
@@ -24,7 +26,8 @@ export bool init(void)
 
 export void render(void)
 {
-    game_update_and_render(&g_game_state, 16, g_width, g_height);
+    time += 16;
+    game_update_and_render(&g_game_state, time, g_width, g_height);
 }
 
 export void window_resize(int w, int h)
