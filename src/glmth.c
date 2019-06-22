@@ -275,17 +275,17 @@ m4 glmth_rotate(m4 m, f32 rad, v3 axis)
 
     m4 r = glmth_m4_init_id();
 
-    r.E[0][0] = c + (powf(axis.x, 2.0f) * (1 - c));
+    r.E[0][0] = c + ((axis.x * axis.x) * (1 - c));
     r.E[0][1] = (axis.x * axis.y * (1 - c)) - (axis.z * s);
     r.E[0][2] = (axis.x * axis.z * (1 - c)) + (axis.y * s);
 
     r.E[1][0] = (axis.y * axis.x * (1 - c)) + (axis.z * s);
-    r.E[1][1] = c + (powf(axis.y, 2.0f) * (1 - c));
+    r.E[1][1] = c + ((axis.y * axis.y) * (1 - c));
     r.E[1][2] = (axis.y * axis.z * (1 - c)) - (axis.x * s);
 
     r.E[2][0] = (axis.z * axis.x * (1 - c)) - (axis.y * s);
     r.E[2][1] = (axis.z * axis.y * (1 - c)) + (axis.x * s);
-    r.E[2][2] = c + (powf(axis.z, 2.0f) * (1 - c));
+    r.E[2][2] = c + ((axis.z * axis.z) * (1 - c));
 
     return glmth_m4m4_m(m, r);
 }

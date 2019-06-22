@@ -1,7 +1,6 @@
 #include "game.h"
 
 #include <assert.h>
-#include <math.h>
 
 // TODO: remove references to emscripten
 #ifdef __EMSCRIPTEN__
