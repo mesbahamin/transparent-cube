@@ -115,11 +115,6 @@ v3 glmth_v3_init_f(f32 f)
     return glmth_v3_init(f, f, f);
 }
 
-f32 glmth_v3_length(v3 v)
-{
-    return glmth_sqrtf((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
-}
-
 v3 glmth_v3f_m(v3 v, f32 s)
 {
     v3 r = { .x = v.x * s, .y = v.y * s, .z = v.z * s };
@@ -131,15 +126,6 @@ v3 glmth_v3_negate(v3 v)
     v3 r = { .x = -v.x, .y = -v.y, .z = -v.z };
     return r;
 }
-
-
-v3 glmth_v3_normalize(v3 v)
-{
-    f32 l = glmth_v3_length(v);
-    v3 r = glmth_v3_init(v.x / l, v.y / l, v.z / l);
-    return r;
-}
-
 
 void glmth_v3_print(v3 v)
 {
@@ -266,9 +252,9 @@ m4 glmth_rotate_z(m4 m, f32 rad)
 }
 
 
-m4 glmth_rotate(m4 m, f32 rad, v3 axis)
+m4 glmth_rotate(m4 m, f32 rad, v3 normalized_axis)
 {
-    axis = glmth_v3_normalize(axis);
+    v3 axis = normalized_axis;
 
     f32 c = glmth_cosf(rad);
     f32 s = glmth_sinf(rad);
@@ -385,27 +371,4 @@ m4 glmth_projection_perspective_fov(f32 fovy, f32 aspect, f32 near, f32 far)
     f32 top = half_height;
 
     return glmth_projection_perspective(left, right, bottom, top, near, far);
-}
-
-
-m4 glmth_camera_look_at(v3 camera_pos, v3 camera_target, v3 up)
-{
-    v3 camera_direction = glmth_v3_normalize(glmth_v3_s(camera_pos, camera_target));
-    v3 camera_right = glmth_v3_normalize(glmth_v3_cross(up, camera_direction));
-    v3 camera_up = glmth_v3_cross(camera_direction, camera_right);
-
-    m4 look = glmth_m4_init_id();
-    look.E[0][0] = camera_right.x;
-    look.E[0][1] = camera_right.y;
-    look.E[0][2] = camera_right.z;
-
-    look.E[1][0] = camera_up.x;
-    look.E[1][1] = camera_up.y;
-    look.E[1][2] = camera_up.z;
-
-    look.E[2][0] = camera_direction.x;
-    look.E[2][1] = camera_direction.y;
-    look.E[2][2] = camera_direction.z;
-
-    return glmth_m4m4_m(look, glmth_translate(glmth_m4_init_id(), glmth_v3_negate(camera_pos)));
 }

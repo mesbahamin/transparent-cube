@@ -22,11 +22,6 @@ typedef double r64;
 
 #include <math.h>
 
-static inline f32 glmth_sqrtf(f32 x)
-{
-    return sqrtf(x);
-}
-
 static inline f32 glmth_sinf(f32 x)
 {
     return sinf(x);
