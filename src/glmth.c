@@ -117,7 +117,7 @@ v3 glmth_v3_init_f(f32 f)
 
 f32 glmth_v3_length(v3 v)
 {
-    return sqrtf((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
+    return glmth_sqrtf((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
 }
 
 v3 glmth_v3f_m(v3 v, f32 s)
@@ -217,8 +217,8 @@ f32 glmth_rad(f32 deg)
 
 m4 glmth_rotate_x(m4 m, f32 rad)
 {
-    f32 c = cosf(rad);
-    f32 s = sinf(rad);
+    f32 c = glmth_cosf(rad);
+    f32 s = glmth_sinf(rad);
 
     m4 r = glmth_m4_init_id();
 
@@ -234,8 +234,8 @@ m4 glmth_rotate_x(m4 m, f32 rad)
 
 m4 glmth_rotate_y(m4 m, f32 rad)
 {
-    f32 c = cosf(rad);
-    f32 s = sinf(rad);
+    f32 c = glmth_cosf(rad);
+    f32 s = glmth_sinf(rad);
 
     m4 r = glmth_m4_init_id();
 
@@ -251,8 +251,8 @@ m4 glmth_rotate_y(m4 m, f32 rad)
 
 m4 glmth_rotate_z(m4 m, f32 rad)
 {
-    f32 c = cosf(rad);
-    f32 s = sinf(rad);
+    f32 c = glmth_cosf(rad);
+    f32 s = glmth_sinf(rad);
 
     m4 r = glmth_m4_init_id();
 
@@ -270,8 +270,8 @@ m4 glmth_rotate(m4 m, f32 rad, v3 axis)
 {
     axis = glmth_v3_normalize(axis);
 
-    f32 c = cosf(rad);
-    f32 s = sinf(rad);
+    f32 c = glmth_cosf(rad);
+    f32 s = glmth_sinf(rad);
 
     m4 r = glmth_m4_init_id();
 
@@ -377,7 +377,7 @@ m4 glmth_projection_perspective(f32 left, f32 right, f32 bottom, f32 top, f32 ne
 
 m4 glmth_projection_perspective_fov(f32 fovy, f32 aspect, f32 near, f32 far)
 {
-    f32 half_height = tanf(fovy / 2.0f) * near;
+    f32 half_height = glmth_tanf(fovy / 2.0f) * near;
     f32 half_width = half_height * aspect;
     f32 left = -half_width;
     f32 right = half_width;

@@ -5,8 +5,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include <math.h>
-
 #ifndef M_PI
 #define M_PI 3.14159265359f
 #endif
@@ -21,6 +19,28 @@ typedef int32_t s32;
 typedef int64_t s64;
 typedef float f32;
 typedef double r64;
+
+#include <math.h>
+
+static inline f32 glmth_sqrtf(f32 x)
+{
+    return sqrtf(x);
+}
+
+static inline f32 glmth_sinf(f32 x)
+{
+    return sinf(x);
+}
+
+static inline f32 glmth_cosf(f32 x)
+{
+    return cosf(x);
+}
+
+static inline f32 glmth_tanf(f32 x)
+{
+    return tanf(x);
+}
 
 typedef union
 {
