@@ -165,9 +165,11 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
 
         m4 model = glmth_m4_init_id();
         f32 angle = 20.0f;
-        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(1.0f, 0.0f, 0.0f));
-        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(0.0f, 1.0f, 0.0f));
-        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(0.0f, 0.0f, 1.0f));
+        // TODO: fmodf this so we don't get huge numbers eventually
+        f32 rot_rad = dt * glmth_rad(angle);
+        model = glmth_rotate(model, rot_rad, glmth_v3_init(1.0f, 0.0f, 0.0f));
+        model = glmth_rotate(model, rot_rad, glmth_v3_init(0.0f, 1.0f, 0.0f));
+        model = glmth_rotate(model, rot_rad, glmth_v3_init(0.0f, 0.0f, 1.0f));
 
         f32 alpha = 0.2f * (1.5f + glmth_sinf(0.5f * dt));
         shader_setm4(&game_state->cube_shader, "model", &model);

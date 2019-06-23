@@ -251,7 +251,6 @@ m4 glmth_rotate_z(m4 m, f32 rad)
     return glmth_m4m4_m(m, r);
 }
 
-
 m4 glmth_rotate(m4 m, f32 rad, v3 normalized_axis)
 {
     v3 axis = normalized_axis;

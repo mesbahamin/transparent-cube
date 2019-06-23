@@ -1,6 +1,6 @@
 CC = clang
 CFLAGS = -std=c99 -Ilib -Wall -Wextra -Wshadow -Wswitch-enum -Wno-unused-parameter -Wno-missing-braces
-LDFLAGS = -ldl -lglfw -lGL -lm
+LDFLAGS = -ldl -lglfw -lGL
 
 SRC_FILES = game.c glad.c glmth.c platform_linux.c shader.c
 SRC = $(addprefix src/, $(SRC_FILES))
