@@ -2,10 +2,13 @@ function canvas_resize() {
     let pr = window.devicePixelRatio;
     let w = window.innerWidth;
     let h = window.innerHeight;
-    gl.canvas.width = (w * pr) | 0;
-    gl.canvas.height = (h * pr) | 0;
-    exports['window_resize']((w * pr) | 0, (h * pr) | 0);
-    console.log("resize: [" + (w * pr | 0) + ", " + (h * pr | 0) + "] > [" + (w | 0) + ", " + (h | 0) + "]");
+    // Bitwise OR does float truncation
+    let w_pixels = (w * pr) | 0;
+    let h_pixels = (h * pr) | 0;
+    gl.canvas.width = w_pixels;
+    gl.canvas.height = h_pixels
+    exports['window_resize'](w_pixels, h_pixels);
+    console.log("resize: (" + w_pixels + ", " + h_pixels + ")");
 }
 
 function canvas_render() {
