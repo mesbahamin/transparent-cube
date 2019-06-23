@@ -32,5 +32,6 @@ webglUniform3f
 webglUniformMatrix4fv
 webglUseProgram
 webglVertexAttribPointer
+webglViewport
 js_read_entire_file
 js_print

@@ -143,6 +143,9 @@ imports["webglUseProgram"] = function(program_id) {
 imports["webglVertexAttribPointer"] = function(index, size, type, normalized, stride, offset) {
     gl.vertexAttribPointer(index, size, type, normalized, stride, offset);
 }
+imports["webglViewport"] = function(x, y, width, height) {
+    gl.viewport(x, y, width, height);
+}
 
 imports["js_read_entire_file"] = function(name, name_len, out_buf) {
     let file_name = utf8decoder.decode(memory.subarray(name, name + name_len))

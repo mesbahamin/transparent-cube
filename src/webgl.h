@@ -40,6 +40,7 @@ void webglUniform3f(i32 location, f32 x, f32 y, f32 z);
 void webglUniformMatrix4fv(i32 location, const f32 data[static 16]);
 void webglUseProgram(i32 program);
 void webglVertexAttribPointer(i32 index, i32 size, i32 type, i32 normalized, i32 stride, i32 offset);
+void webglViewport(i32 x, i32 y, i32 width, i32 height);
 
 #define GL_DEPTH_BUFFER_BIT 0x00000100
 #define GL_COLOR_BUFFER_BIT 0x00004000
@@ -267,6 +268,11 @@ inline void glUseProgram(GLuint program)
 inline void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer)
 {
     webglVertexAttribPointer(WEBGL_CAST_I32(index), WEBGL_CAST_I32(size), WEBGL_CAST_I32(type), WEBGL_CAST_I32(normalized), WEBGL_CAST_I32(stride), WEBGL_CAST_I32(pointer));
+}
+
+inline void glViewport(GLint x, GLint y, GLsizei width, GLsizei height)
+{
+    webglViewport(x, y, WEBGL_CAST_I32(width), WEBGL_CAST_I32(height));
 }
 
 #undef WEBGL_CAST_I32
