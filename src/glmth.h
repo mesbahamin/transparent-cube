@@ -15,6 +15,115 @@ typedef signed long long   i64;
 typedef float              f32;
 typedef double             f64;
 
+#define GLMTH_PI        3.14159265358979323846f
+#define GLMTH_M_2_PI    6.28318530717958647693f
+#define GLMTH_D_4_PI    1.27323954473516268615f
+#define GLMTH_D_PI_2    1.57079632679489661923f
+#define GLMTH_D_4_SQ_PI 0.40528473456935108578f
+
+static inline f32 glmth_floorf(f32 x)
+{
+    f32 result = (f32)((i32)x - (x < 0.0f));
+    return result;
+}
+
+// These Sine and Cosine approximations use a parabola adjusted to minimize
+// error. This lovely approximation was derived by "Nick" on the devmaster.net
+// forums:
+//
+// https://web.archive.org/web/20080228213915/http://www.devmaster.net/forums/showthread.php?t=5784
+static inline f32 glmth_sinf(f32 x)
+{
+
+    // wrap to range [0, 2PI]
+    f32 full_circles = glmth_floorf(x / GLMTH_M_2_PI);
+    f32 full_circle_radians = full_circles * GLMTH_M_2_PI;
+    x = x - full_circle_radians;
+
+    // TODO: remove branches
+    // wrap to range [-PI, PI]
+    if(x < -GLMTH_PI)
+    {
+        x += GLMTH_M_2_PI;
+    }
+    else if(x > GLMTH_PI)
+    {
+        x -= GLMTH_M_2_PI;
+    }
+
+    // fit parabola to sine
+    f32 f = 0.0f;
+    f32 g = 0.0f;
+    if(x < 0.0f)
+    {
+        f = (GLMTH_D_4_PI * x) + (GLMTH_D_4_SQ_PI * x * x);
+        g = f * -f;
+
+    }
+    else
+    {
+        f = (GLMTH_D_4_PI * x) - (GLMTH_D_4_SQ_PI * x * x);
+        g = f * f;
+    }
+
+    f32 h = g - f;
+    f32 i = h * 0.225f;
+    f = i + f;
+
+    return f;
+}
+
+static inline f32 glmth_cosf(f32 x)
+{
+    // wrap to range [0, 2PI]
+    f32 full_circles = glmth_floorf(x / GLMTH_M_2_PI);
+    f32 full_circle_radians = full_circles * GLMTH_M_2_PI;
+    x = x - full_circle_radians;
+
+    // TODO: remove branches
+    // wrap to range [-PI, PI]
+    if(x < -GLMTH_PI)
+    {
+        x += GLMTH_M_2_PI;
+    }
+    else if(x > GLMTH_PI)
+    {
+        x -= GLMTH_M_2_PI;
+    }
+
+    x += GLMTH_D_PI_2;
+    if(x > GLMTH_PI)
+    {
+        x -= GLMTH_M_2_PI;
+    }
+
+    // fit parabola to cosine
+    f32 f = 0.0f;
+    f32 g = 0.0f;
+    if(x < 0.0f)
+    {
+        f = (GLMTH_D_4_PI * x) + (GLMTH_D_4_SQ_PI * x * x);
+        g = f * -f;
+
+    }
+    else
+    {
+        f = (GLMTH_D_4_PI * x) - (GLMTH_D_4_SQ_PI * x * x);
+        g = f * f;
+    }
+
+    f32 h = g - f;
+    f32 i = h * 0.225f;
+    f = i + f;
+    return f;
+}
+
+static inline f32 glmth_tanf(f32 x)
+{
+    // TODO: make a proper approximation
+    return glmth_sinf(x)/glmth_cosf(x);
+}
+
 typedef union
 {
     struct
@@ -137,18 +246,6 @@ static inline v3 glmth_v3_init(f32 x, f32 y, f32 z)
     return v;
 }
 
-static inline f32 glmth_v3_length(v3 v)
-{
-    return sqrtf((v.x * v.x) + (v.y * v.y) + (v.z * v.z));
-}
-
-static inline v3 glmth_v3_normalize(v3 v)
-{
-    f32 l = glmth_v3_length(v);
-    v3 r = glmth_v3_init(v.x / l, v.y / l, v.z / l);
-    return r;
-}
-
 static inline f32 glmth_rad(f32 deg)
 {
     return deg * (M_PI / 180.0f);
@@ -156,24 +253,22 @@ static inline f32 glmth_rad(f32 deg)
 
 static inline m4 glmth_rotate(m4 m, f32 rad, v3 axis)
 {
-    //axis = glmth_v3_normalize(axis);
-
-    f32 c = cosf(rad);
-    f32 s = sinf(rad);
+    f32 c = glmth_cosf(rad);
+    f32 s = glmth_sinf(rad);
 
     m4 r = glmth_m4_init_id();
 
-    r.E[0][0] = c + (powf(axis.x, 2.0f) * (1 - c));
+    r.E[0][0] = c + ((axis.x * axis.x) * (1 - c));
     r.E[0][1] = (axis.x * axis.y * (1 - c)) - (axis.z * s);
     r.E[0][2] = (axis.x * axis.z * (1 - c)) + (axis.y * s);
 
     r.E[1][0] = (axis.y * axis.x * (1 - c)) + (axis.z * s);
-    r.E[1][1] = c + (powf(axis.y, 2.0f) * (1 - c));
+    r.E[1][1] = c + ((axis.y * axis.y) * (1 - c));
     r.E[1][2] = (axis.y * axis.z * (1 - c)) - (axis.x * s);
 
     r.E[2][0] = (axis.z * axis.x * (1 - c)) - (axis.y * s);
     r.E[2][1] = (axis.z * axis.y * (1 - c)) + (axis.x * s);
-    r.E[2][2] = c + (powf(axis.z, 2.0f) * (1 - c));
+    r.E[2][2] = c + ((axis.z * axis.z) * (1 - c));
 
     return glmth_m4m4_m(m, r);
 }
@@ -252,7 +347,7 @@ static inline m4 glmth_projection_perspective(f32 left, f32 right, f32 bottom, f
 
 static inline m4 glmth_projection_perspective_fov(f32 fovy, f32 aspect, f32 near, f32 far)
 {
-    f32 half_height = tanf(fovy / 2.0f) * near;
+    f32 half_height = glmth_tanf(fovy / 2.0f) * near;
     f32 half_width = half_height * aspect;
     f32 left = -half_width;
     f32 right = half_width;
