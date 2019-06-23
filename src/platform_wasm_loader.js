@@ -1,3 +1,11 @@
+let utf8decoder = new TextDecoder("utf-8");
+let memory = null;
+let exports = {};
+let imports = {};
+let files = [];
+let gl = null;
+let gl_id_freelist = [];
+let gl_id_map = [null];
 imports["webglAttachShader"] = function(program_id, shader_id) {
     let program = gl_id_map[program_id];
     let shader = gl_id_map[shader_id];
@@ -114,9 +122,10 @@ imports["webglLinkProgram"] = function(program_id) {
     let program = gl_id_map[program_id];
     gl.linkProgram(program);
 }
-imports["webglShaderSource"] = function(shader_id, source_ptr, src_len) {
+imports["webglShaderSource"] = function(shader_id, source_ptr, source_len) {
     let shader = gl_id_map[shader_id];
-    let s = buf2str(source_ptr, src_len);
+    let arr = memory.subarray(source_ptr, source_ptr + source_len);
+    let s = utf8decoder.decode(arr);
     gl.shaderSource(shader, s);
 }
 imports["webglUniform1f"] = function(location_id, value) {
@@ -146,7 +155,6 @@ imports["webglVertexAttribPointer"] = function(index, size, type, normalized, st
 imports["webglViewport"] = function(x, y, width, height) {
     gl.viewport(x, y, width, height);
 }
-
 imports["js_read_entire_file"] = function(name, name_len, out_buf) {
     let file_name = utf8decoder.decode(memory.subarray(name, name + name_len))
     if (file_name == "shader/cube_f.glsl") {
@@ -161,8 +169,80 @@ imports["js_read_entire_file"] = function(name, name_len, out_buf) {
     arr.set(new Uint8Array(file));
     return true;
 }
-
 imports["js_print"] = function(s, len) {
     let arr = memory.subarray(s, s + len);
     console.log(utf8decoder.decode(arr));
+}
+function error_fatal(message) {
+    console.log(message);
+    throw message;
+}
+function webgl_id_new(obj) {
+    if(gl_id_freelist.length == 0) {
+        gl_id_map.push(obj);
+        return gl_id_map.length - 1;
+    } else {
+        let id = gl_id_freelist.shift();
+        gl_id_map[id] = obj;
+        return id;
+    }
+}
+function webgl_id_remove(id) {
+    delete gl_id_map[id];
+    gl_id_freelist.push(id);
+}
+function canvas_resize() {
+    let pr = window.devicePixelRatio;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    // Bitwise OR does float truncation
+    let w_pixels = (w * pr) | 0;
+    let h_pixels = (h * pr) | 0;
+    gl.canvas.width = w_pixels;
+    gl.canvas.height = h_pixels
+    exports['window_resize'](w_pixels, h_pixels);
+    console.log("resize: (" + w_pixels + ", " + h_pixels + ")");
+}
+function canvas_render() {
+    exports['render']();
+    window.requestAnimationFrame(canvas_render);
+}
+function file_load(name) {
+    let promise = new Promise((resolve, reject) => {
+        fetch(name).then(resp => {
+            resp.arrayBuffer().then(arr => resolve(arr));
+        });
+    });
+    return promise;
+}
+window.onload = async function() {
+    let ctxopts = {
+        alpha: false,
+        depth: true,
+        stencil: false,
+        antialias: true,
+        preserveDrawingBuffer: false
+    };
+    gl = document.getElementById("webglcanvas").getContext("webgl2", ctxopts);
+    if(!gl) {
+        error_fatal("Your browser does not support WebGL 2.");
+    }
+    files[0] = file_load("binary.wasm");
+    files[1] = file_load("shader/cube_f.glsl");
+    files[2] = file_load("shader/cube_v.glsl");
+    for(var i=0; i<files.length; i++) {
+        files[i] = await files[i];
+    }
+    let binary = files[0];
+    imports['memory'] = new WebAssembly.Memory({'initial':32});
+    memory = new Uint8Array(imports['memory']['buffer']);
+    let program = await WebAssembly.instantiate(binary, {"env":imports});
+    let instance = program['instance'];
+    exports = instance['exports'];
+    canvas_resize();
+    window.addEventListener("resize", canvas_resize);
+    if(!exports['init']()) {
+        error_fatal("Game initialization failed.");
+    }
+    canvas_render();
 }

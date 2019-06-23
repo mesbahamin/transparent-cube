@@ -1,20 +1,40 @@
+#!/usr/bin/env bash
 
-mkdir -p ./out/wasm
-cat js/globals.js js/utils.js js/imports.js js/loader.js > ./out/wasm/script.js
-cp index.html ./out/wasm/index.html
-cp -r shader/ ./out/wasm/
+set -e                     # fail if any command has a non-zero exit status
+set -u                     # fail if any undefined variable is referenced
+set -o pipefail            # propagate failure exit status through a pipeline
+shopt -s globstar nullglob # enable recursive and null globbing
 
-clang -cc1 -Ofast -emit-llvm-bc -triple=wasm32-unknown-unknown-unknown-wasm -std=c11 \
+out_dir="./out"
+wasm_dir="${out_dir}/wasm"
+
+mkdir -p $wasm_dir
+cp src/platform_wasm_loader.js $wasm_dir/script.js
+cp src/platform_wasm_index.html $wasm_dir/index.html
+cp -r shader/ $wasm_dir
+
+clang \
+    -cc1 \
+    -Ofast \
+    -emit-llvm-bc \
+    -triple=wasm32-unknown-unknown-unknown-wasm \
     -ffreestanding \
     -fno-builtin \
+    -std=c11 \
     -DGAME_WEBGL \
     src/platform_wasm.c
-llvm-link -o wasm.bc src/*.bc
-opt -O3 -disable-simplify-libcalls wasm.bc -o wasm.bc
-llc -O3 -disable-simplify-libcalls -filetype=obj wasm.bc -o wasm.o
 
-wasm-ld --no-entry wasm.o \
-    -o ./out/wasm/binary.wasm \
-    -allow-undefined-file wasm_js_implemented_symbols.txt \
+llvm-link -o $wasm_dir/wasm.bc src/*.bc
+opt -O3 -disable-simplify-libcalls $wasm_dir/wasm.bc -o $wasm_dir/wasm.bc
+llc -O3 -disable-simplify-libcalls -filetype=obj $wasm_dir/wasm.bc -o $wasm_dir/wasm.o
+
+wasm-ld \
+    --no-entry $wasm_dir/wasm.o \
+    -o $wasm_dir/binary.wasm \
+    -allow-undefined-file src/platform_wasm_js_symbols.txt \
     --export-all \
     --import-memory
+
+rm $wasm_dir/*.o
+rm $wasm_dir/*.bc
+rm src/*.bc
