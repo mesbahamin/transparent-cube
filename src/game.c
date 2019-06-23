@@ -1,7 +1,6 @@
 #include "game.h"
 
 #include <assert.h>
-#include <math.h>
 
 // TODO: remove references to emscripten
 #ifdef __EMSCRIPTEN__
@@ -48,56 +47,6 @@ float randf(float min, float max)
 
 void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t screen_height)
 {
-    // load pyramid vertex data
-    {
-        float edge_length = 1.0f;
-        float height = 1.0f / sqrtf(2.0f) * edge_length;
-        float half_length = edge_length / 2.0f;
-        float half_height = height / 2.0f;
-
-        GLfloat pyramid_vertices[] = {
-             // positions
-             -half_length, -half_height, -half_length,
-             -half_length, -half_height,  half_length,
-              half_length, -half_height,  half_length,
-              half_length, -half_height, -half_length,
-              0.0f,         half_height,  0.0f,
-        };
-
-        GLuint elements[] = {
-            0, 3, 2,
-            2, 1, 0,
-            0, 4, 3,
-            3, 4, 2,
-            2, 4, 1,
-            1, 4, 0,
-        };
-
-        GLuint pyramid_vao_id;
-        glGenVertexArrays(1, &pyramid_vao_id);
-        glBindVertexArray(pyramid_vao_id);
-
-        GLuint pyramid_vbo_id;
-        glGenBuffers(1, &pyramid_vbo_id);
-        glBindBuffer(GL_ARRAY_BUFFER, pyramid_vbo_id);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(pyramid_vertices), pyramid_vertices, GL_STATIC_DRAW);
-
-        // positions
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(*pyramid_vertices), (GLvoid*)0);
-        glEnableVertexAttribArray(0);
-
-        GLuint pyramid_ebo_id;
-        glGenBuffers(1, &pyramid_ebo_id);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, pyramid_ebo_id);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
-
-        glBindVertexArray(0);
-
-        game_state->pyramid_vao_id = pyramid_vao_id;
-        game_state->pyramid_vbo_id = pyramid_vbo_id;
-        game_state->pyramid_ebo_id = pyramid_ebo_id;
-    }
-
     // load cube vertex data
     {
         GLfloat cube_vertices[] = {
@@ -187,9 +136,9 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
 
         f32 color_freq = dt * 0.1f;
         v3 pyramid_color = glmth_v3_init(
-                sinf(color_freq),
-                sinf(color_freq + (2 * M_PI / 3)),
-                sinf(color_freq + (4 * M_PI / 3)));
+                glmth_sinf(color_freq),
+                glmth_sinf(color_freq + (2 * M_PI / 3)),
+                glmth_sinf(color_freq + (4 * M_PI / 3)));
         shader_setm4(&game_state->pyramid_shader, "model", &model);
         shader_setv3(&game_state->pyramid_shader, "pyramid_color", &pyramid_color);
 
@@ -216,11 +165,13 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
 
         m4 model = glmth_m4_init_id();
         f32 angle = 20.0f;
-        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(1.0f, 0.0f, 0.0f));
-        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(0.0f, 1.0f, 0.0f));
-        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(0.0f, 0.0f, 1.0f));
+        // TODO: fmodf this so we don't get huge numbers eventually
+        f32 rot_rad = dt * glmth_rad(angle);
+        model = glmth_rotate(model, rot_rad, glmth_v3_init(1.0f, 0.0f, 0.0f));
+        model = glmth_rotate(model, rot_rad, glmth_v3_init(0.0f, 1.0f, 0.0f));
+        model = glmth_rotate(model, rot_rad, glmth_v3_init(0.0f, 0.0f, 1.0f));
 
-        f32 alpha = 0.2f * (1.5f + sinf(0.5f * dt));
+        f32 alpha = 0.2f * (1.5f + glmth_sinf(0.5f * dt));
         shader_setm4(&game_state->cube_shader, "model", &model);
         shader_setf(&game_state->cube_shader, "alpha", alpha);
 

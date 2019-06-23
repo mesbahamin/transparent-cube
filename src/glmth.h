@@ -2,7 +2,6 @@
 #define GLMTH_H
 
 #include <assert.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -20,6 +19,116 @@ typedef int32_t s32;
 typedef int64_t s64;
 typedef float f32;
 typedef double r64;
+
+#define GLMTH_PI        3.14159265358979323846f
+#define GLMTH_M_2_PI    6.28318530717958647693f
+#define GLMTH_D_4_PI    1.27323954473516268615f
+#define GLMTH_D_PI_2    1.57079632679489661923f
+#define GLMTH_D_4_SQ_PI 0.40528473456935108578f
+
+static inline f32 glmth_floorf(f32 x)
+{
+    f32 result = (f32)((s32)x - (x < 0.0f));
+    return result;
+}
+
+
+// These Sine and Cosine approximations use a parabola adjusted to minimize
+// error. This lovely approximation was derived by "Nick" on the devmaster.net
+// forums:
+//
+// https://web.archive.org/web/20080228213915/http://www.devmaster.net/forums/showthread.php?t=5784
+static inline f32 glmth_sinf(f32 x)
+{
+
+    // wrap to range [0, 2PI]
+    f32 full_circles = glmth_floorf(x / GLMTH_M_2_PI);
+    f32 full_circle_radians = full_circles * GLMTH_M_2_PI;
+    x = x - full_circle_radians;
+
+    // TODO: remove branches
+    // wrap to range [-PI, PI]
+    if(x < -GLMTH_PI)
+    {
+        x += GLMTH_M_2_PI;
+    }
+    else if(x > GLMTH_PI)
+    {
+        x -= GLMTH_M_2_PI;
+    }
+
+    // fit parabola to sine
+    f32 f = 0.0f;
+    f32 g = 0.0f;
+    if(x < 0.0f)
+    {
+        f = (GLMTH_D_4_PI * x) + (GLMTH_D_4_SQ_PI * x * x);
+        g = f * -f;
+
+    }
+    else
+    {
+        f = (GLMTH_D_4_PI * x) - (GLMTH_D_4_SQ_PI * x * x);
+        g = f * f;
+    }
+
+    f32 h = g - f;
+    f32 i = h * 0.225f;
+    f = i + f;
+
+    return f;
+}
+
+static inline f32 glmth_cosf(f32 x)
+{
+    // wrap to range [0, 2PI]
+    f32 full_circles = glmth_floorf(x / GLMTH_M_2_PI);
+    f32 full_circle_radians = full_circles * GLMTH_M_2_PI;
+    x = x - full_circle_radians;
+
+    // TODO: remove branches
+    // wrap to range [-PI, PI]
+    if(x < -GLMTH_PI)
+    {
+        x += GLMTH_M_2_PI;
+    }
+    else if(x > GLMTH_PI)
+    {
+        x -= GLMTH_M_2_PI;
+    }
+
+    x += GLMTH_D_PI_2;
+    if(x > GLMTH_PI)
+    {
+        x -= GLMTH_M_2_PI;
+    }
+
+    // fit parabola to cosine
+    f32 f = 0.0f;
+    f32 g = 0.0f;
+    if(x < 0.0f)
+    {
+        f = (GLMTH_D_4_PI * x) + (GLMTH_D_4_SQ_PI * x * x);
+        g = f * -f;
+
+    }
+    else
+    {
+        f = (GLMTH_D_4_PI * x) - (GLMTH_D_4_SQ_PI * x * x);
+        g = f * f;
+    }
+
+    f32 h = g - f;
+    f32 i = h * 0.225f;
+    f = i + f;
+    return f;
+}
+
+static inline f32 glmth_tanf(f32 x)
+{
+    // TODO: make a proper approximation
+    return glmth_sinf(x)/glmth_cosf(x);
+}
 
 typedef union
 {
@@ -124,5 +233,4 @@ m4 glmth_projection_ortho(f32 left, f32 right, f32 bottom, f32 top, f32 near, f3
 m4 glmth_projection_perspective(f32 left, f32 right, f32 bottom, f32 top, f32 near, f32 far);
 m4 glmth_projection_perspective_fov(f32 fovy, f32 aspect, f32 near, f32 far);
 m4 glmth_camera_look_at(v3 camera_pos, v3 camera_target, v3 up);
-
 #endif
