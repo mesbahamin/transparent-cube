@@ -37,7 +37,7 @@ void webglShaderSource(i32 shader, const char source[static 1], i32 source_len);
 void webglUniform1f(i32 location, f32 value);
 void webglUniform1i(i32 location, i32 value);
 void webglUniform3f(i32 location, f32 x, f32 y, f32 z);
-void webglUniformMatrix4fv(i32 location, const f32 data[static 16]);
+void webglUniformMatrix4fv(i32 location, i32 transpose, const f32 data[static 16]);
 void webglUseProgram(i32 program);
 void webglVertexAttribPointer(i32 index, i32 size, i32 type, i32 normalized, i32 stride, i32 offset);
 void webglViewport(i32 x, i32 y, i32 width, i32 height);
@@ -257,7 +257,7 @@ inline void glUniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
 
 inline void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
 {
-    webglUniformMatrix4fv(WEBGL_CAST_I32(location), value);
+    webglUniformMatrix4fv(WEBGL_CAST_I32(location), WEBGL_CAST_I32(transpose), value);
 }
 
 inline void glUseProgram(GLuint program)
