@@ -1,14 +1,25 @@
 #version 300 es
-
 precision highp float;
 
-uniform float alpha;
+in vec4 vertex_color;
 
-in vec3 color;
-
-out vec4 frag_color;
+out vec4 color;
 
 void main()
 {
-    frag_color = vec4(color, alpha);
+    color = vertex_color;
 }
+//#version 300 es
+//
+//precision highp float;
+//
+//uniform float alpha;
+//
+//in vec3 color;
+//
+//out vec4 frag_color;
+//
+//void main()
+//{
+//    frag_color = vec4(color, alpha);
+//}

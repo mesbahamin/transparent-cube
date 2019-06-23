@@ -8,6 +8,45 @@
 
 void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height)
 {
+#if 1
+    {
+        GLfloat triangle_vertices[] = {
+            // positions   // colors
+            -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+            0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+            0.0f,  0.5f,  0.0f,  0.0f,  1.0f,
+        };
+        u32 elements[] = {
+            0, 1, 2,
+        };
+
+        GLuint VBO;
+        GLuint VAO;
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+
+        glBindVertexArray(VAO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(triangle_vertices), triangle_vertices, GL_STATIC_DRAW);
+
+        // positions
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+        glEnableVertexAttribArray(0);
+
+        // colors
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
+
+        u32 cube_ebo;
+        glGenBuffers(1, &cube_ebo);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
+        game_state->cube_vao = VAO;
+        game_state->cube_vbo = VBO;
+        game_state->cube_ebo = cube_ebo;
+    }
+#else
     // load cube vertex data
     {
         f32 cube_vertices[] = {
@@ -57,6 +96,7 @@ void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height
         game_state->cube_vbo = cube_vbo;
         game_state->cube_ebo = cube_ebo;
     }
+#endif
 
     // game_shader_load
     {
@@ -72,15 +112,26 @@ void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height
         game_state->cube_shader = main_shader;
     }
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
 
 #ifndef GAME_WEBGL
-    glEnable(GL_MULTISAMPLE);
+    //glEnable(GL_MULTISAMPLE);
 #endif
 }
 
 void game_update_and_render(struct GameState *game_state, float dt, u32 screen_width, u32 screen_height)
 {
+#if 1
+    {
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        shader_use(&game_state->cube_shader);
+
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+    }
+#else
     glDepthMask(GL_TRUE);
     glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -124,6 +175,7 @@ void game_update_and_render(struct GameState *game_state, float dt, u32 screen_w
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
     }
+#endif
 }
 
 void game_cleanup(struct GameState *game_state)
