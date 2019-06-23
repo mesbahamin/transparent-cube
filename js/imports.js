@@ -134,6 +134,8 @@ imports["webglUniform3f"] = function(location_id, x, y, z) {
 imports["webglUniformMatrix4fv"] = function(location_id, data) {
     let loc = gl_id_map[location_id];
     let dataslice = memory.slice(data, data + 4 * 16);
+    // TODO: figure out why we need to transpose the matrix here, but not in
+    // normal opengl
     gl.uniformMatrix4fv(loc, true, new Float32Array(dataslice.buffer));
 }
 imports["webglUseProgram"] = function(program_id) {
