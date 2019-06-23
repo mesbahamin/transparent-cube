@@ -134,7 +134,7 @@ imports["webglUniform3f"] = function(location_id, x, y, z) {
 imports["webglUniformMatrix4fv"] = function(location_id, data) {
     let loc = gl_id_map[location_id];
     let dataslice = memory.slice(data, data + 4 * 16);
-    gl.uniformMatrix4fv(loc, false, new Float32Array(dataslice.buffer));
+    gl.uniformMatrix4fv(loc, true, new Float32Array(dataslice.buffer));
 }
 imports["webglUseProgram"] = function(program_id) {
     let program = gl_id_map[program_id];
