@@ -8,7 +8,7 @@
 
 void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height)
 {
-#if 1
+#if 0
     {
         GLfloat triangle_vertices[] = {
             // positions   // colors
@@ -121,15 +121,14 @@ void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height
 
 void game_update_and_render(struct GameState *game_state, float dt, u32 screen_width, u32 screen_height)
 {
-#if 1
+#if 0
     {
         m4 view = glmth_m4_init_id();
         m4 projection = glmth_m4_init_id();
-        //TODO: make these transforms work on webgl like the do natively
-        //view = glmth_translate(view, glmth_v3_init(0.0f, 0.0f, -3.0f));
-        //projection = glmth_projection_perspective_fov(glmth_rad(45.0f), (float)screen_width / (float)screen_height, 0.1f, 100.0f);
+        view = glmth_translate(view, glmth_v3_init(0.0f, 0.0f, -3.0f));
+        projection = glmth_projection_perspective_fov(glmth_rad(45.0f), (float)screen_width / (float)screen_height, 0.1f, 100.0f);
 
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.1f, 0.4f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         m4 model = glmth_m4_init_id();
@@ -157,16 +156,17 @@ void game_update_and_render(struct GameState *game_state, float dt, u32 screen_w
 
     m4 view = glmth_m4_init_id();
     m4 projection = glmth_m4_init_id();
-    view = glmth_translate(view, glmth_v3_init(0.0f, 0.0f, -3.0f));
-    projection = glmth_projection_perspective_fov(glmth_rad(45.0f), (float)screen_width / (float)screen_height, 0.1f, 100.0f);
+    //TODO: make these transforms work on webgl like the do natively
+    //view = glmth_translate(view, glmth_v3_init(0.0f, 0.0f, -3.0f));
+    //projection = glmth_projection_perspective_fov(glmth_rad(45.0f), (float)screen_width / (float)screen_height, 0.1f, 100.0f);
 
     // render cube
     {
         // Depth testing causes the blending to be applied inconsistently
         // depending on the draw order, so we must disable it.
-        glDisable(GL_DEPTH_TEST);
+        //glDisable(GL_DEPTH_TEST);
 
-        glEnable(GL_BLEND);
+        //glEnable(GL_BLEND);
         // TODO: get this to work regardless of background color
         glBlendColor(0.0f, 0.0f, 0.0f, 1.0f);
         glBlendFunc(GL_SRC_ALPHA, GL_CONSTANT_ALPHA);
@@ -179,8 +179,10 @@ void game_update_and_render(struct GameState *game_state, float dt, u32 screen_w
         f32 angle = 20.0f;
         // TODO: fmodf this so we don't get huge numbers eventually
         f32 rot_rad = dt * glmth_rad(angle);
-        model = glmth_rotate(model, rot_rad, glmth_v3_init(1.0f, 0.0f, 0.0f));
-        model = glmth_rotate(model, rot_rad, glmth_v3_init(0.0f, 1.0f, 0.0f));
+        // TODO: Figure out why the cube rotates counter clockwise on linux but
+        // clockwise on wasm
+        //model = glmth_rotate(model, rot_rad, glmth_v3_init(1.0f, 0.0f, 0.0f));
+        //model = glmth_rotate(model, rot_rad, glmth_v3_init(0.0f, 1.0f, 0.0f));
         model = glmth_rotate(model, rot_rad, glmth_v3_init(0.0f, 0.0f, 1.0f));
 
         f32 alpha = 0.2f * (1.5f + glmth_sinf(0.5f * dt));
