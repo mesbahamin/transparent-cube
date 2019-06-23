@@ -34,6 +34,7 @@ export void window_resize(int w, int h)
 {
     g_width = w;
     g_height = h;
+    glViewport(0, 0, g_width, g_height);
 }
 
 i32 str_length(const char *str)

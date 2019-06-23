@@ -121,7 +121,6 @@ void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height
 
 void game_update_and_render(struct GameState *game_state, float dt, u32 screen_width, u32 screen_height)
 {
-    glViewport(0, 0, screen_width, screen_height);
 #if 1
     {
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
