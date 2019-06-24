@@ -22,9 +22,10 @@ clang \
     -fno-builtin \
     -std=c11 \
     -DGAME_WEBGL \
+    -o $wasm_dir/wasm.bc \
     src/platform_wasm.c
 
-llvm-link -o $wasm_dir/wasm.bc src/*.bc
+llvm-link -o $wasm_dir/wasm.bc $wasm_dir/wasm.bc
 opt -O3 -disable-simplify-libcalls $wasm_dir/wasm.bc -o $wasm_dir/wasm.bc
 llc -O3 -disable-simplify-libcalls -filetype=obj $wasm_dir/wasm.bc -o $wasm_dir/wasm.o
 
