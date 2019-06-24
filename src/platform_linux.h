@@ -4,8 +4,6 @@
 #include <stdbool.h>
 #include <time.h>
 
-#include "game.h"
-
 #define PLATFORM_SCR_WIDTH 600
 #define PLATFORM_SCR_HEIGHT 600
 
@@ -15,16 +13,12 @@
 #define PLATFORM_UPDATES_PER_SECOND 120
 #define PLATFORM_MS_PER_UPDATE (PLATFORM_SECOND / PLATFORM_UPDATES_PER_SECOND)
 
+PLATFORM_READ_ENTIRE_FILE(linux_read_entire_file);
+PLATFORM_PRINT(linux_print);
+PLATFORM_MEMORY_FREE(linux_memory_free);
+
 #ifdef PLATFORM_HOTLOAD_GAME_CODE
-#define PLATFORM_GAME_LIB_PATH "./build/release/game.so"
-struct GameCode
-{
-    bool is_valid;
-    void *game_code_library;
-    time_t last_write_time;
-    game_load_opengl_symbols_func *game_load_opengl_symbols;
-    game_update_and_render_func *game_update_and_render;
-};
+#define PLATFORM_GAME_LIB_PATH "./out/release/game.so"
 #endif // PLATFORM_HOTLOAD_GAME_CODE
 
 #endif // PLATFORM_LINUX_H

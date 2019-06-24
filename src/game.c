@@ -1,55 +1,16 @@
 #include "game.h"
 
-#include <assert.h>
-
-// TODO: remove references to emscripten
-#ifdef __EMSCRIPTEN__
-#include <GLES3/gl3.h>
-#else
-#include "glad/glad.h"
+#ifndef GAME_WEBGL
+#include "glad.c"
 #endif
 
+#include "shader.c"
 
-#ifdef PLATFORM_HOTLOAD_GAME_CODE
-void game_load_opengl_symbols(void)
-{
-    gladLoadGL();
-}
-#endif
-
-
-float wrap(float n, float min, float max)
-{
-    if (n > max)
-    {
-        return min;
-    }
-    else if (n < min)
-    {
-        return max;
-    }
-    else
-    {
-        return n;
-    }
-}
-
-
-float randf(float min, float max)
-{
-    assert(min < max);
-    float random = ((float) rand()) / (float) RAND_MAX;
-    float diff = max - min;
-    float r = random * diff;
-    return min + r;
-}
-
-
-void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t screen_height)
+void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height)
 {
     // load cube vertex data
     {
-        GLfloat cube_vertices[] = {
+        f32 cube_vertices[] = {
              // positions         // colors
             -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f,
             -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f,
@@ -61,7 +22,7 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
              0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 1.0f,
         };
 
-        GLuint elements[] = {
+        u32 elements[] = {
             0, 4, 6, 6, 2, 0,
             1, 5, 7, 7, 3, 1,
             3, 2, 0, 0, 1, 3,
@@ -70,11 +31,11 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
             2, 6, 7, 7, 3, 2,
         };
 
-        GLuint cube_vao;
+        u32 cube_vao;
         glGenVertexArrays(1, &cube_vao);
         glBindVertexArray(cube_vao);
 
-        GLuint cube_vbo;
+        u32 cube_vbo;
         glGenBuffers(1, &cube_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
@@ -86,31 +47,39 @@ void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t scr
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(*cube_vertices), (GLvoid*)(3 * sizeof(*cube_vertices)));
         glEnableVertexAttribArray(1);
 
-        GLuint cube_ebo;
+        u32 cube_ebo;
         glGenBuffers(1, &cube_ebo);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cube_ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
-        glBindVertexArray(0);
 
         game_state->cube_vao = cube_vao;
         game_state->cube_vbo = cube_vbo;
         game_state->cube_ebo = cube_ebo;
     }
 
-    game_state->pyramid_shader = shader_compile("shader/pyramid_v.glsl", "shader/pyramid_f.glsl");
-    game_state->cube_shader = shader_compile("shader/cube_v.glsl", "shader/cube_f.glsl");
+    // game_shader_load
+    {
+        struct PlatformApi platform = game_state->platform;
+        char *v_source = platform.platform_read_entire_file("shader/cube_v.glsl");
+        char *f_source = platform.platform_read_entire_file("shader/cube_f.glsl");
+        print = platform.platform_print;
+        struct Shader main_shader = {0};
+        // TODO: Check this result
+        shader_compile(v_source, f_source, &main_shader);
+        platform.platform_memory_free(v_source);
+        platform.platform_memory_free(f_source);
+        game_state->cube_shader = main_shader;
+    }
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
 
-    // TODO: remove references to emscripten
-#ifndef __EMSCRIPTEN__
-    glEnable(GL_MULTISAMPLE);
+#ifndef GAME_WEBGL
+    //glEnable(GL_MULTISAMPLE);
 #endif
 }
 
-
-void game_update_and_render(struct GameState *game_state, float dt, uint32_t screen_width, uint32_t screen_height)
+void game_update_and_render(struct GameState *game_state, float dt, u32 screen_width, u32 screen_height)
 {
     glDepthMask(GL_TRUE);
     glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
@@ -122,31 +91,6 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
     m4 projection = glmth_m4_init_id();
     view = glmth_translate(view, glmth_v3_init(0.0f, 0.0f, -3.0f));
     projection = glmth_projection_perspective_fov(glmth_rad(45.0f), (float)screen_width / (float)screen_height, 0.1f, 100.0f);
-
-#if 0
-    // render pyramid
-    {
-        shader_use(&game_state->pyramid_shader);
-        shader_setm4(&game_state->pyramid_shader, "view", &view);
-        shader_setm4(&game_state->pyramid_shader, "projection", &projection);
-
-        m4 model = glmth_m4_init_id();
-        f32 angle = 20.0f;
-        model = glmth_rotate(model, dt * glmth_rad(angle), glmth_v3_init(0.5f, 1.0f, 0.0f));
-
-        f32 color_freq = dt * 0.1f;
-        v3 pyramid_color = glmth_v3_init(
-                glmth_sinf(color_freq),
-                glmth_sinf(color_freq + (2 * M_PI / 3)),
-                glmth_sinf(color_freq + (4 * M_PI / 3)));
-        shader_setm4(&game_state->pyramid_shader, "model", &model);
-        shader_setv3(&game_state->pyramid_shader, "pyramid_color", &pyramid_color);
-
-        glBindVertexArray(game_state->pyramid_vao_id);
-        glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-    }
-#endif
 
     // render cube
     {
@@ -175,19 +119,23 @@ void game_update_and_render(struct GameState *game_state, float dt, uint32_t scr
         shader_setm4(&game_state->cube_shader, "model", &model);
         shader_setf(&game_state->cube_shader, "alpha", alpha);
 
-        glBindVertexArray(game_state->cube_vao);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
 
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
     }
 }
 
-
 void game_cleanup(struct GameState *game_state)
 {
-    glDeleteVertexArrays(1, &game_state->pyramid_vao_id);
-    glDeleteBuffers(1, &game_state->pyramid_vbo_id);
-    glDeleteBuffers(1, &game_state->pyramid_ebo_id);
+    glDeleteVertexArrays(1, &game_state->cube_vao);
+    glDeleteBuffers(1, &game_state->cube_vbo);
+    glDeleteBuffers(1, &game_state->cube_ebo);
 }
+
+#ifdef PLATFORM_HOTLOAD_GAME_CODE
+void game_load_opengl_symbols(void)
+{
+    gladLoadGL();
+}
+#endif

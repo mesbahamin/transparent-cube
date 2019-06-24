@@ -4,9 +4,6 @@
 #include <stdbool.h>
 #include <time.h>
 
-#include <GLFW/glfw3.h>
-#include "game.h"
-
 #define PLATFORM_SCR_WIDTH 600
 #define PLATFORM_SCR_HEIGHT 600
 

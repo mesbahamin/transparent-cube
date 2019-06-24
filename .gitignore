@@ -1,6 +1,9 @@
 *.out
 *.swp
 
-build/*
+*.bc
+*.o
+
+out/*
 
 tags

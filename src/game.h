@@ -1,41 +1,44 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
-// TODO: remove references to emscripten
-#ifdef __EMSCRIPTEN__
-#include <GLES3/gl3.h>
+#include <stddef.h>
+#include <stdint.h>
+#define static_assert _Static_assert
+
+#define NULL ((void*)0)
+
+// TODO: fix this
+#define assert(x) (void)0
+
+typedef _Bool bool;
+#define true 1
+#define false 0
+
+#ifdef GAME_WEBGL
+#include "webgl.h"
 #else
 #include "glad/glad.h"
 #endif
 
 #include "glmth.h"
 #include "shader.h"
+#include "platform.h"
 
-
-struct GameState
+void *memcpy(void *dst, const void *src, size_t n)
 {
-    GLuint pyramid_vao_id;
-    GLuint pyramid_vbo_id;
-    GLuint pyramid_ebo_id;
-    GLuint cube_vao;
-    GLuint cube_vbo;
-    GLuint cube_ebo;
-    struct Shader pyramid_shader;
-    struct Shader cube_shader;
-};
+  u8 *destination = (u8 *)dst;
+  u8 *source = (u8 *)src;
 
-#ifdef PLATFORM_HOTLOAD_GAME_CODE
-// We need to call this from the platform layer in order for the game, when
-// built as a shared object library to have access to the OpenGL symbols.
-// https://github.com/Dav1dde/glad/issues/151
-typedef void (game_load_opengl_symbols_func)(void);
-void game_load_opengl_symbols(void);
-#endif // PLATFORM_HOTLOAD_GAME_CODE
+  while (n--) {
+    *destination = *source;
+    destination++;
+    source++;
+  }
 
-typedef void (game_update_and_render_func)(struct GameState *game_state, float dt, uint32_t screen_width, uint32_t screen_height);
-void game_update_and_render(struct GameState *game_state, float dt, uint32_t screen_width, uint32_t screen_height);
+  return dst;
+}
 
-void game_init(struct GameState *game_state, uint32_t screen_width, uint32_t screen_height);
+// TODO: Consider finding a better way to make this func available
+static platform_print_func* print;
+
+void game_init(struct GameState *game_state, u32 screen_width, u32 screen_height);
 void game_cleanup(struct GameState *game_state);
-
-#endif
