@@ -2,11 +2,6 @@
 #include "platform.h"
 #include "platform_wasm.h"
 
-#define export __attribute__( ( visibility( "default" ) ) )
-
-char *js_read_entire_file(i32 file_path, i32 name_len, char *file_data);
-int js_print(i32 string, i32 len);
-
 struct GameState g_game_state = {0};
 i32 g_width = PLATFORM_SCR_WIDTH;
 i32 g_height = PLATFORM_SCR_HEIGHT;
@@ -14,8 +9,7 @@ char g_mem_buffer[1000] = {0};
 i32 g_mem_buffer_i = 0;
 u32 time = 0;
 
-
-export bool init(void)
+bool init(void)
 {
     g_game_state.platform.platform_read_entire_file = &wasm_read_entire_file;
     g_game_state.platform.platform_print = &wasm_print;
@@ -24,13 +18,13 @@ export bool init(void)
     return true;
 }
 
-export void render(void)
+void render(void)
 {
     time += 16;
     game_update_and_render(&g_game_state, time/1000.0f, g_width, g_height);
 }
 
-export void window_resize(int w, int h)
+void window_resize(int w, int h)
 {
     g_width = w;
     g_height = h;

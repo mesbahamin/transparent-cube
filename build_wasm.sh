@@ -33,9 +33,10 @@ wasm-ld \
     --no-entry $wasm_dir/wasm.o \
     -o $wasm_dir/binary.wasm \
     -allow-undefined-file src/platform_wasm_js_symbols.txt \
-    --export-all \
+    --export=init \
+    --export=render \
+    --export=window_resize \
     --import-memory
 
 rm $wasm_dir/*.o
 rm $wasm_dir/*.bc
-rm src/*.bc
