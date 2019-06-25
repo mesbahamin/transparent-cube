@@ -1,9 +1,9 @@
 *.out
 *.swp
-
 *.bc
 *.o
 
 out/*
+lib/glfw_windows/*
 
 tags
