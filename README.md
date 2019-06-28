@@ -1,3 +1,8 @@
+# Transparent Cube
+
+
+## Build
+
 ### Compile on Linux
 
 - Install clang and glfw3 with your system's package manager.
@@ -28,5 +33,23 @@ lib/glfw_windows/
   release build.
 
 
- [1]: https://gist.github.com/InNoHurryToCode/955d63db0d79699fed63fe18eeebf17e
- [2]: https://www.glfw.org/download.html
+## References
+
+### WebAssembly and WebGL
+
+- [Notes on working with C and WebAssembly][3]
+- [Compiling C to WebAssembly Without Emscripten][4]
+
+
+### Approximating Trigonometric Functions
+
+- [Handmade Hero Day 400: Introduction to Function Approximation with Andrew Bromage][5]
+- [Fast and accurate sine/cosine - DevMaster.net Forums][6]
+
+
+[1]: https://gist.github.com/InNoHurryToCode/955d63db0d79699fed63fe18eeebf17e
+[2]: https://www.glfw.org/download.html
+[3]: https://aransentin.github.io/cwasm/
+[4]: https://dassur.ma/things/c-to-webassembly/
+[5]: https://guide.handmadehero.org/code/day440/
+[6]: https://web.archive.org/web/20080228213915/http://www.devmaster.net/forums/showthread.php?t=5784
