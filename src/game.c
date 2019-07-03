@@ -104,8 +104,8 @@ void game_update_and_render(struct GameState *game_state, float dt, u32 screen_w
         glBlendFunc(GL_SRC_ALPHA, GL_CONSTANT_ALPHA);
 
         shader_use(&game_state->cube_shader);
-        shader_setm4(&game_state->cube_shader, "view", &view);
-        shader_setm4(&game_state->cube_shader, "projection", &projection);
+        shader_setm4(&game_state->cube_shader, SHADER_UNIFORM_VIEW, &view);
+        shader_setm4(&game_state->cube_shader, SHADER_UNIFORM_PROJECTION, &projection);
 
         m4 model = glmth_m4_init_id();
         f32 angle = 20.0f;
@@ -116,8 +116,8 @@ void game_update_and_render(struct GameState *game_state, float dt, u32 screen_w
         model = glmth_rotate(model, rot_rad, glmth_v3_init(0.0f, 0.0f, 1.0f));
 
         f32 alpha = 0.2f * (1.5f + glmth_sinf(0.5f * dt));
-        shader_setm4(&game_state->cube_shader, "model", &model);
-        shader_setf(&game_state->cube_shader, "alpha", alpha);
+        shader_setm4(&game_state->cube_shader, SHADER_UNIFORM_MODEL, &model);
+        shader_setf(&game_state->cube_shader, SHADER_UNIFORM_ALPHA, alpha);
 
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 
